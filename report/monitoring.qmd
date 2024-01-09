@@ -1,0 +1,474 @@
+---
+title: "Monitoring SCAPES progress and sampling"
+author: "David Simons"
+format: 
+   html:
+      toc: true
+      toc-depth: 4
+server: shiny
+---
+
+```{r setup, echo=FALSE, message=FALSE}
+if (!requireNamespace("DT", quietly = TRUE)) install.packages("DT")
+if (!requireNamespace("ggspatial", quietly = TRUE)) install.packages("ggspatial")
+if (!requireNamespace("gratia", quietly = TRUE)) install.packages("gratia")
+if (!requireNamespace("haven", quietly = TRUE)) install.packages("haven")
+if (!requireNamespace("here", quietly = TRUE)) install.packages("here")
+if (!requireNamespace("jpeg", quietly = TRUE)) install.packages("jpeg")
+if (!requireNamespace("sf", quietly = TRUE)) install.packages("sf")
+if (!requireNamespace("terra", quietly = TRUE)) install.packages("terra")
+if (!requireNamespace("tidyverse", quietly = TRUE)) install.packages("tidyverse")
+if (!requireNamespace("tidyterra", quietly = TRUE)) install.packages("tidyterra")
+if (!requireNamespace("units", quietly = TRUE)) install.packages("units")
+
+library(DT)
+library(ggspatial)
+library(gratia)
+library(haven)
+library(here)
+library(jpeg)
+library(sf)
+library(terra)
+library(tidyverse)
+library(tidyterra)
+library(units)
+
+knitr::opts_chunk$set(message = FALSE)
+
+project_CRS = "EPSG:4326"
+utm_nigeria_CRS = "EPSG:26332"
+
+village_state <- read_rds(here("data", "additional", "village_state.rds"))
+hh_df <- read_rds(here("data", "h_data", "hh_df_list_cleaned.rds"))
+hh_df$household_demographics <- zap_label(hh_df$household_demographics)
+village_colours <- read_rds(here("data", "additional", "village_colours.rds"))
+
+```
+
+## Status
+
+Data is being collected from 9 villages across 3 states.
+
+```{r}
+#| column: body
+
+styled_table <- datatable(
+   village_state %>%
+      rename_all(~str_to_sentence(str_replace_all(., "_", " "))) %>%
+      select(1:3),
+  escape = FALSE,
+  options = list(
+    dom = 't',
+    paging = FALSE,
+    ordering = FALSE,
+    searching = FALSE
+  )
+) %>%
+  formatStyle(
+    "Village",
+    backgroundColor = styleEqual(
+      levels = village_state$village,
+      values = village_state$village_colour),
+    color = "white",
+    fontWeight = "bold",
+    zeroWidth = TRUE  # Hide text
+  ) %>%
+  formatStyle(
+    "State",
+    backgroundColor = styleEqual(
+      levels = village_state$state,
+      values = village_state$state_colour
+    ),
+    color = "white",
+    fontWeight = "bold",
+    zeroWidth = TRUE  # Hide text
+  )
+
+# Print the styled table
+styled_table
+
+```
+
+```{r status_chunk, echo=FALSE, message=FALSE}
+
+villages <- village_state[village_state$abbreviation %in% unique(str_split(hh_df$household_main$household_id, "-", simplify = TRUE)[ , 1]), ]
+
+n_in_households <- max(hh_df$household_demographics$hh_resident_id)
+
+median_n_in_households <- hh_df$household_demographics %>%
+   group_by(`_index`) %>%
+   summarise(n = n()) %>%
+   ungroup() %>%
+  summarise(median_n = median(n),
+            iqr_n = IQR(n))
+
+sex_composition_in_households <- hh_df$household_demographics %>%
+   group_by(sex) %>%
+   summarise(n_sex = n()) %>%
+   mutate(prop_sex = round(n_sex/sum(n_sex), 2))
+
+age_composition_in_households <- hh_df$household_demographics %>%
+   summarise(median_age = median(age, na.rm = TRUE),
+             iqr_age = IQR(age, na.rm = TRUE))
+
+age_composition_sex_stratified <- hh_df$household_demographics %>%
+   group_by(sex) %>%
+   summarise(median_age = median(age, na.rm = TRUE),
+             iqr_age = IQR(age, na.rm = TRUE))
+
+```
+
+`r length(unique(hh_df$household_main$household_id))` households have currently been sampled between the period of `r as.Date(min(hh_df$household_main$start))` and `r as.Date(max(hh_df$household_main$start))`. These households have been sampled in `r length(unique(str_split(hh_df$household_main$household_id, "-", simplify = TRUE)[ , 1]))` village(s). These village(s) are `r paste(paste0(villages$village, " - ", villages$state), collapse = ", ")`.
+
+## Sample characteristics
+
+### Household size
+
+The sampled households include `r n_in_households` individuals with a median of `r median_n_in_households["median_n"]` individuals per household and an interquartile range (IQR) of `r median_n_in_households["iqr_n"]`. This is slightly higher than the mean number of household members reported in the Nigeria DHS 2018 report of 4.3 (urban) and 5 (rural), however, based on the reported summary statistics this is not normally distributed and so the median may be more similar. Further, there may be important heterogeneity by region in Nigeria. Primary data access to the DHS to allow better comparisons has been requested.
+
+#### Distribution of household sizes
+
+``` {r hh-size}
+
+hh_sizes <- hh_df$household_demographics %>%
+   group_by(`_index`) %>%
+   summarise(n = n()) %>%
+   ungroup() 
+
+hh_ids <- hh_df$household_main %>%
+   group_by(`_index`) %>%
+   summarise(abbreviation = unique(str_split(household_id, "-", simplify = TRUE)[, 1])) %>%
+   left_join(village_state, by = "abbreviation")
+
+hh_sizes %>%
+   left_join(hh_ids) %>%
+   ggplot() +
+   geom_bar(aes(x = n, fill = village)) +
+   scale_fill_manual(values = village_colours) +
+   facet_wrap(~ village, scales = "free_x") +
+   theme_minimal() +
+   labs(x = "Number of individuals in household",
+        y = "Count",
+        fill = element_blank())
+```
+
+### Sex
+
+`r sex_composition_in_households$n_sex[sex_composition_in_households$sex == "female"]` females (`r sex_composition_in_households$prop_sex[sex_composition_in_households$sex == "female"]`) and `r sex_composition_in_households$n_sex[sex_composition_in_households$sex == "male"]` males (`r sex_composition_in_households$prop_sex[sex_composition_in_households$sex == "male"]`) are permanently or temporarily resident within these households. This compares to a 1.06 male/female ratio at birth (CIA World Factbook) and data from the DHS 2018 which suggests that women are more likely to reside in rural (54.2%) than urban (45.8%) settings and more so than males (53.6% rural vs. 46.4% urban).
+
+### Age
+
+The sampled households have a median age of `r age_composition_in_households$median_age` (IQR = `r age_composition_in_households$iqr_age`) which compares to a median age of 19.2 (CIA World Factbook). Females within the households sampled have a median age of `r age_composition_sex_stratified$median_age[age_composition_sex_stratified$sex == "female"]` (IQR = `r age_composition_sex_stratified$iqr_age[age_composition_sex_stratified$sex == "female"]`) which compares to 19.4 for females from the CIA World Factbook. Males within sampled households have a median age of `r age_composition_sex_stratified$median_age[age_composition_sex_stratified$sex == "male"]` (IQR = `r age_composition_sex_stratified$iqr_age[age_composition_sex_stratified$sex == "male"]`) which compares to 18.9 for males from the CIA world Factbook.
+
+#### Population pyramid
+
+``` {r population-pyramid}
+
+# Create age bands for all individuals
+age_bands <- hh_df$household_demographics %>%
+   drop_na(age) %>%
+   arrange(age) %>%
+   mutate(age_band = base::cut(age, breaks = c(seq(0, 100, 5), Inf),
+                               right = FALSE, include.lowest = TRUE,
+                               labels = c(paste0(seq(0, 95, 5), "-", seq(4, 99, 5)), "100+"))) %>%
+   group_by(sex, age_band) %>%
+   summarise(population = n()) %>%
+   mutate(population = case_when(sex == "female" ~ population,
+                                 TRUE ~ -population))
+
+population_pyramid <- ggplot() +
+   geom_col(data = age_bands, aes(y = age_band, x = population, fill = factor(sex, levels = c("male", "female"))),
+            position = "identity",
+            width = 1,
+            colour = "black") +
+   scale_fill_manual(values = c("male" = "#0e65e6", "female" = "#fbc1c0"),
+                    breaks = c("male", "female"),
+                    labels = c("Male", "Female")) +
+   scale_x_continuous(labels = function(x) abs(x),
+                      limits = c(-max(abs(age_bands$population)), max(abs(age_bands$population)))) +
+   labs(title = paste0("Population Pyramid, N = ", nrow(hh_df$household_demographics %>%
+                                                           drop_na(age, sex))), 
+        y = "Age",
+        x = "Count") +
+   theme_minimal() +
+   theme(legend.position = "top") +
+   guides(fill = guide_legend(title = NULL))
+
+```
+
+```{r pop-figs}
+#| column: screen-inset-shaded
+#| layout-nrow: 1
+#| out-width: "30%"
+
+plot(population_pyramid)
+knitr::include_graphics("files/NI_popgraph2023.jpeg")
+
+```
+
+### Geographic
+
+```{r geo-data}
+if(!file.exists(here("data", "spatial", "village_sampling.rds"))) {
+   library(sf)
+   set.seed(42)
+   
+   villages <- read_csv(here("data", "spatial", "scapes_spatial.csv")) %>%
+      filter(location %in% village_state$village) %>%
+      vect(geom = c("longitude", "latitude"), crs = project_CRS)
+   
+   # households sampled
+   hh_list <- hh_df$household_main %>%
+      select(household_id, latitude, longitude) %>%
+      mutate(abbreviation = str_split(household_id, "-", simplify = TRUE)[, 1]) %>%
+      left_join(., village_state) %>%
+      select(household_id, village, latitude, longitude)
+   
+   hh_vect <- vect(hh_list, geom = c("longitude", "latitude"), crs = project_CRS)
+   
+   # abk_open_buildings was obtained from https://sites.research.google/open-buildings/ and subset to the study region elsewhere
+   # Can be replicated by downloading and using the NGA shapefile to crop the dataset to make it more manageable
+   buildings <- read_rds(here("data", "spatial", "abk_open_buildings", "abk_open_buildings_crop.rds")) %>%
+      vect() %>%
+      project(y = project_CRS)
+   
+   # Convert to UTM for equal area projection
+   villages_utm <- project(villages, utm_nigeria_CRS)
+   
+   buildings_utm <- project(buildings, utm_nigeria_CRS)
+   
+   # create a cell size
+   cell_size = as_units(4900, "m^2")
+   units(cell_size) <- "km^2"
+   
+   # geo sampling summary
+   geo_sample_list <- vector("list", length = length(villages))
+   
+   for(i in seq_along(villages)) {
+      
+      # set a buffer distance, initially 1km radius from the centre of the village or as far away as the furthest household sampled
+      buffer_distance <- max(c(1000,ifelse(
+         nrow(hh_vect[hh_vect$village %in% villages[i]$location, ]) > 0,
+         max(distance(hh_vect[hh_vect$village %in% villages[i]$location, ], villages[i])),
+         0
+      )))
+      
+      # buffer around village location
+      current_buffer <- buffer(villages_utm[i], buffer_distance)
+      
+      # subset buildings within village
+      buildings_in_village <- intersect(buildings_utm, current_buffer)
+      
+      # create presence variable
+      buildings_in_village_df <- st_as_sf(buildings_in_village) %>%
+         mutate(x = st_coordinates(geometry)[, 1],
+                y = st_coordinates(geometry)[, 2],
+                presence = 1) %>%
+         select(-geometry)
+      
+      # produce a grid of the village
+      grid <- st_make_grid(st_as_sf(current_buffer), cellsize = cell_size, square = TRUE)
+      
+      # Remove grid cells that intersect with buildings
+      
+      grid_without_buildings <- erase(vect(grid), buildings_in_village)
+      grid_with_buildings <- vect(grid)[buildings_in_village]
+      grid_with_buildings$confidence <- zonal(buildings_in_village, grid_with_buildings, fun = "max")$confidence
+      
+      # Convert remaining grid cells to centroid points
+      absence_points <- sample(centroids(grid_without_buildings), size = round(nrow(grid_without_buildings) * .66, 0), replace = FALSE)
+      
+      # Create a data frame for absence points with presence = 0
+      absence_df <- st_as_sf(absence_points) %>%
+         mutate(presence = 0,
+                x = st_coordinates(geometry)[, 1],
+                y = st_coordinates(geometry)[, 2]) %>%
+         select(-geometry)
+      
+      # Fit a spatial GAM
+      gam_model_buildings <- gam(presence ~ s(x, y, k = 360, bs = "tp"), data = bind_rows(buildings_in_village_df,
+                                                                                          absence_df),
+                                 family = "binomial")
+      
+      current_sample <- if (length(hh_vect %>%
+                                   project(utm_nigeria_CRS) %>%
+                                   filter(village %in% current_buffer$location)) < 1) {
+         data.frame(household_id = NA,
+                    village = NA,
+                    x = NA,
+                    y = NA)
+      } else {
+         hh_vect %>%
+            project(utm_nigeria_CRS) %>%
+            filter(village %in% current_buffer$location) %>%
+            as.data.frame(geom = "XY")
+      }
+      
+      absence_points_df <- grid_without_buildings %>%
+         centroids() %>%
+         as.data.frame(geom = "XY")
+      
+      presence_points_df <- grid_with_buildings %>%
+         centroids() %>%
+         as.data.frame(geom = "XY")
+      
+      comparison_df <- bind_rows(current_sample, absence_points_df, presence_points_df) %>%
+         drop_na(x, y) %>%
+         mutate(class = case_when(!is.na(household_id) ~ "Household",
+                                  !is.na(confidence) ~ "Building",
+                                  TRUE ~ "Absence")) %>%
+         select(class, x, y)
+      
+      comparison_df$predicted_values <- predict(gam_model_buildings, comparison_df, type = "response")
+      
+      viz_building_model <- getViz(gam_model_buildings)
+      
+      building_dens <- plot(sm(viz_building_model, 1)) +
+         l_fitRaster() +
+         l_fitContour() +
+         coord_cartesian(expand = FALSE) +
+         geom_spatvector(data = project(buildings_in_village, utm_nigeria_CRS),
+                         colour = "black", inherit.aes = FALSE, alpha = 0.8) +
+         geom_spatvector(data = project(absence_points, utm_nigeria_CRS),
+                         colour = "white", inherit.aes = FALSE, alpha = 0.4) +
+         geom_spatvector(data = project(hh_vect %>%
+                                           filter(village %in% current_buffer$location), utm_nigeria_CRS),
+                         colour = "orange", inherit.aes = FALSE, alpha = 0.8) +
+         guides(fill = "none") +
+         labs(title = paste0("Building and sampling locations: ", current_buffer$location),
+              x = element_blank(),
+              y = element_blank()) +
+         annotation_scale()
+      
+      
+      summary_geo <- tibble(village = unique(current_buffer$location),
+                            n_buildings_identified = nrow(buildings_in_village_df),
+                            n_households_sampled = nrow(current_sample %>%
+                                                           drop_na(household_id)),
+                            prop_of_buildings = round(n_households_sampled/n_buildings_identified, 2),
+                            weighted_sum_sample = round((sum(comparison_df$predicted_values[comparison_df$class == "Household"]) * n_households_sampled)/sum(comparison_df$predicted_values), 2))
+      
+      geo_sample_list[[i]]$summary_geo <- summary_geo
+      geo_sample_list[[i]]$sample_plot <- building_dens
+      
+      
+   }
+   
+   write_rds(geo_sample_list, here("data", "spatial", "village_sampling.rds"))
+   village_sampling <- geo_sample_list
+   
+} else {
+   
+   village_sampling <- read_rds(here("data", "spatial", "village_sampling.rds"))
+   
+}
+
+names(village_sampling) <- village_state$village
+```
+
+::: {.panel-tabset}
+
+#### Zugu
+
+`r village_sampling$Zugu$summary_geo$n_households_sampled` households have been sampled. `r village_sampling$Zugu$summary_geo$n_buildings_identified` buildings have been identified within the village.
+
+```{r zugu-sampling}
+
+village_sampling$Zugu$sample_plot
+village_sampling$Zugu$summary_geo
+```
+
+#### Dyegh
+
+`r village_sampling$Dyegh$summary_geo$n_households_sampled` households have been sampled. `r village_sampling$Dyegh$summary_geo$n_buildings_identified` buildings have been identified within the village.
+
+```{r dyegh-sampling}
+
+village_sampling$Dyegh$sample_plot
+village_sampling$Dyegh$summary_geo
+
+```
+
+#### Ikyogbakpev
+
+`r village_sampling$Ikyogbakpev$summary_geo$n_households_sampled` households have been sampled. `r village_sampling$Ikyogbakpev$summary_geo$n_buildings_identified` buildings have been identified within the village.
+
+```{r ikyogbakpev-sampling}
+
+village_sampling$Ikyogbakpev$sample_plot
+village_sampling$Ikyogbakpev$summary_geo
+```
+
+#### Okimbongha
+
+`r village_sampling$Okimbongha$summary_geo$n_households_sampled` households have been sampled. `r village_sampling$Okimbongha$summary_geo$n_buildings_identified` buildings have been identified within the village.
+
+```{r okimbongha-sampling}
+
+village_sampling$Okimbongha$sample_plot
+village_sampling$Okimbongha$summary_geo
+
+```
+
+#### Ogamanna
+
+`r village_sampling$Ogamanna$summary_geo$n_households_sampled` households have been sampled. `r village_sampling$Ogamanna$summary_geo$n_buildings_identified` buildings have been identified within the village.
+
+```{r ogamanna-sampling}
+
+village_sampling$Ogamanna$sample_plot
+village_sampling$Ogamanna$summary_geo
+
+```
+
+#### Ofonekom
+
+`r village_sampling$Ofonekom$summary_geo$n_households_sampled` households have been sampled. `r village_sampling$Ofonekom$summary_geo$n_buildings_identified` buildings have been identified within the village.
+
+```{r ofonekom-sampling}
+
+village_sampling$Ofonekom$sample_plot
+village_sampling$Ofonekom$summary_geo
+
+```
+
+#### Ezeakataka
+
+`r village_sampling$Ezeakataka$summary_geo$n_households_sampled` households have been sampled. `r village_sampling$Ezeakataka$summary_geo$n_buildings_identified` buildings have been identified within the village.
+
+```{r ezeakataka-sampling}
+
+village_sampling$Ezeakataka$sample_plot
+village_sampling$Ezeakataka$summary_geo
+
+```
+
+#### Enyandulogu
+
+`r village_sampling$Enyandulogu$summary_geo$n_households_sampled` households have been sampled. `r village_sampling$Enyandulogu$summary_geo$n_buildings_identified` buildings have been identified within the village.
+
+```{r enyandulogu-sampling}
+
+village_sampling$Enyandulogu$sample_plot
+village_sampling$Enyandulogu$summary_geo
+
+```
+
+#### Offianka
+
+`r village_sampling$Offianka$summary_geo$n_households_sampled` households have been sampled. `r village_sampling$Offianka$summary_geo$n_buildings_identified` buildings have been identified within the village.
+
+```{r offianka-sampling}
+
+village_sampling$Offianka$sample_plot
+village_sampling$Offianka$summary_geo
+
+```
+
+:::
+
+### Occupation
+
+### Education
+
+### Socioeconomic

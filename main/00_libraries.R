@@ -22,6 +22,7 @@ pkgs <- c(
 pacman::p_load(pkgs, character.only = T)
 
 project_CRS = "EPSG:4326"
+utm_nigeria_CRS = "EPSG:26332"
 
 village_state = tibble(abbreviation = c("zug", "dye", "iky", "oki", "oga", "ofo", "eze", "eny", "off"),
                        village = c("Zugu", "Dyegh", "Ikyogbakpev", "Okimbongha", "Ogamanna", "Ofonekom", "Ezeakataka", "Enyandulogu", "Offianka"),
@@ -56,3 +57,4 @@ village_state <- tibble(village_state,
 write_rds(village_state, here("data", "additional", "village_state.rds"))
 
 village_colours <- setNames(village_state$village_colour, village_state$village)
+write_rds(village_colours, here("data", "additional", "village_colours.rds"))

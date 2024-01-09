@@ -27,13 +27,3 @@ SCAPES_i_id <- kobo_library %>%
   pull(uid)
 
 SCAPES_i_submissions <- get_subs(uid = SCAPES_i_id)
-
-x = SCAPES_i_submissions
-size = 100
-paginate = FALSE
-page_size = NULL
-chunk_size = NULL
-SCAPES_i_df <- kobo_data(SCAPES_i_submissions) %>%
-  dm::dm_flatten_to_tbl(.start = main,
-                        .join = left_join,
-                        .recursive = TRUE)
