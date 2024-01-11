@@ -4,11 +4,14 @@ pkgs <- c(
   "googledrive",
   "robotoolbox",
   "crul",
+  "cowplot",
   "glue",
+  "ggrepel",
   "RcppSimdJson",
   "httr",
   "dm",
   "DT",
+  "haven",
   "here",
   "tidyverse",
   "readxl",
@@ -58,3 +61,26 @@ write_rds(village_state, here("data", "additional", "village_state.rds"))
 
 village_colours <- setNames(village_state$village_colour, village_state$village)
 write_rds(village_colours, here("data", "additional", "village_colours.rds"))
+
+occupation_matching <- data.frame(
+  "Individual questionnaire" = c("Farming", "Assist with agricultural work (in household fields)", "Assist with agricultural work (in other households fields)", 
+                                 "Hunter/Trapper", "Fishing", "Timber", "Collect forest goods (NTFPs)", 
+                                 "Animal husbandry", "Trader", "Artisan/Handiwork/Carpenter", "Driver", 
+                                 "Teacher", "Clergy (minister, pastor)", "Student", "Government worker", 
+                                 "Pensioner", "Other"),
+  "DHS 2018" = c("Agriculture/Agricultural - self employed", "Agriculture/Agricultural - self employed", 
+                 "Agriculture/Agricultural - self employed", "Agriculture/Agricultural - self employed", 
+                 "Agriculture/Agricultural - self employed", "Agriculture/Agricultural - self employed", 
+                 "Agriculture/Agricultural - self employed", "Agriculture/Agricultural - self employed", 
+                 "Sales", "Skilled manual", "Other", "Professional/technical/managerial", 
+                 "Professional/technical/managerial", "Not working/NA/Did not work", 
+                 "Clerical/Professional/technical/managerial", "Not working/NA/Did not work", "Unskilled manual/Services"),
+  "ISCO-08" = c("Field Crop and Vegetable Growers", "Subsistence Crop Farmers", "Subsistence Crop Farmers", 
+                "Subsistence Farmers, Fishers, Hunters and Gatherers", "Subsistence Farmers, Fishers, Hunters and Gatherers", 
+                "Subsistence Farmers, Fishers, Hunters and Gatherers", "Subsistence Fishers, Hunters, Trappers and Gatherers", 
+                "Subsistence Livestock Farmers", "Street and Related Sales and Service Workers", 
+                "Craft and Related Trades Workers", "Car, Van and Motorcycle Drivers", 
+                "Teaching Professionals", "Social and Religious Professionals", "N/A", 
+                "Business and Administration Associate Professionals", "N/A", "N/A"),
+  "ISCO-08 code" = c(6111, 631, 631, 6340, 6340, 6340, 6340, 6320, 95, 7, 832, 23, 263, NA, 33, NA, NA)
+)

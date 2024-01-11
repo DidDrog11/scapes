@@ -9,24 +9,30 @@ server: shiny
 ---
 
 ```{r setup, echo=FALSE, message=FALSE}
+if (!requireNamespace("cowplot", quietly = TRUE)) install.packages("cowplot")
 if (!requireNamespace("DT", quietly = TRUE)) install.packages("DT")
+if (!requireNamespace("ggrepel", quietly = TRUE)) install.packages("ggrepel")
 if (!requireNamespace("ggspatial", quietly = TRUE)) install.packages("ggspatial")
 if (!requireNamespace("gratia", quietly = TRUE)) install.packages("gratia")
 if (!requireNamespace("haven", quietly = TRUE)) install.packages("haven")
 if (!requireNamespace("here", quietly = TRUE)) install.packages("here")
 if (!requireNamespace("jpeg", quietly = TRUE)) install.packages("jpeg")
+if (!requireNamespace("knitr", quietly = TRUE)) install.packages("knitr")
 if (!requireNamespace("sf", quietly = TRUE)) install.packages("sf")
 if (!requireNamespace("terra", quietly = TRUE)) install.packages("terra")
 if (!requireNamespace("tidyverse", quietly = TRUE)) install.packages("tidyverse")
 if (!requireNamespace("tidyterra", quietly = TRUE)) install.packages("tidyterra")
 if (!requireNamespace("units", quietly = TRUE)) install.packages("units")
 
+library(cowplot)
 library(DT)
+library(ggrepel)
 library(ggspatial)
 library(gratia)
 library(haven)
 library(here)
 library(jpeg)
+library(knitr)
 library(sf)
 library(terra)
 library(tidyverse)
@@ -47,7 +53,7 @@ village_colours <- read_rds(here("data", "additional", "village_colours.rds"))
 
 ## Status
 
-Data is being collected from 9 villages across 3 states.
+Data is being collected from 9 villages across 3 states. This document is to monitor sampling progress and assess the representativeness of our sampling within the villages. We do this by comparing to National and State level statistics. It may also be interesting to compare to data obtained as part of the LASV risk factor review.
 
 ```{r}
 #| column: body
@@ -375,7 +381,7 @@ names(village_sampling) <- village_state$village
 ```{r zugu-sampling}
 
 village_sampling$Zugu$sample_plot
-village_sampling$Zugu$summary_geo
+kable(village_sampling$Zugu$summary_geo)
 ```
 
 #### Dyegh
@@ -385,7 +391,7 @@ village_sampling$Zugu$summary_geo
 ```{r dyegh-sampling}
 
 village_sampling$Dyegh$sample_plot
-village_sampling$Dyegh$summary_geo
+kable(village_sampling$Dyegh$summary_geo)
 
 ```
 
@@ -396,7 +402,7 @@ village_sampling$Dyegh$summary_geo
 ```{r ikyogbakpev-sampling}
 
 village_sampling$Ikyogbakpev$sample_plot
-village_sampling$Ikyogbakpev$summary_geo
+kable(village_sampling$Ikyogbakpev$summary_geo)
 ```
 
 #### Okimbongha
@@ -406,7 +412,7 @@ village_sampling$Ikyogbakpev$summary_geo
 ```{r okimbongha-sampling}
 
 village_sampling$Okimbongha$sample_plot
-village_sampling$Okimbongha$summary_geo
+kable(village_sampling$Okimbongha$summary_geo)
 
 ```
 
@@ -417,7 +423,7 @@ village_sampling$Okimbongha$summary_geo
 ```{r ogamanna-sampling}
 
 village_sampling$Ogamanna$sample_plot
-village_sampling$Ogamanna$summary_geo
+kable(village_sampling$Ogamanna$summary_geo)
 
 ```
 
@@ -428,7 +434,7 @@ village_sampling$Ogamanna$summary_geo
 ```{r ofonekom-sampling}
 
 village_sampling$Ofonekom$sample_plot
-village_sampling$Ofonekom$summary_geo
+kable(village_sampling$Ofonekom$summary_geo)
 
 ```
 
@@ -439,7 +445,7 @@ village_sampling$Ofonekom$summary_geo
 ```{r ezeakataka-sampling}
 
 village_sampling$Ezeakataka$sample_plot
-village_sampling$Ezeakataka$summary_geo
+kable(village_sampling$Ezeakataka$summary_geo)
 
 ```
 
@@ -450,7 +456,7 @@ village_sampling$Ezeakataka$summary_geo
 ```{r enyandulogu-sampling}
 
 village_sampling$Enyandulogu$sample_plot
-village_sampling$Enyandulogu$summary_geo
+kable(village_sampling$Enyandulogu$summary_geo)
 
 ```
 
@@ -461,7 +467,7 @@ village_sampling$Enyandulogu$summary_geo
 ```{r offianka-sampling}
 
 village_sampling$Offianka$sample_plot
-village_sampling$Offianka$summary_geo
+kable(village_sampling$Offianka$summary_geo)
 
 ```
 
@@ -469,6 +475,263 @@ village_sampling$Offianka$summary_geo
 
 ### Occupation
 
+Occupation as a measure of representativeness will be assessed comparing the individual level surveys with data obtained from the DHS 2018. Comparisons will be made to State level and State stratified by urban/rural. Matching between our survey and DHS classifications for occupation will be limited by the level of detail provided in the DHS. The DHS has been conducted in Females aged 15-49 and Males aged 15-59.
+
+| Individual questionnaire | DHS 2018 | ISCO-08 | ISCO-08 code |
+|---|---|---| -- |
+| Farming | Agriculture/Agricultural - self employed | Field Crop and Vegetable Growers | 6111 |
+| Assist with agricultural work (in household fields) | Agriculture/Agricultural - self employed | Subsistence Crop Farmers | 631 |
+| Assist with agricultural work (in other households fields) | Agriculture/Agricultural - self employed | Subsistence Crop Farmers | 631 |
+| Hunter/Trapper | Agriculture/Agricultural - self employed | Subsistence Farmers, Fishers, Hunters and Gatherers | 6340 |
+| Fishing | Agriculture/Agricultural - self employed | Subsistence Farmers, Fishers, Hunters and Gatherers | 6340 |
+| Timber | Agriculture/Agricultural - self employed | Subsistence Farmers, Fishers, Hunters and Gatherers | 6340 |
+| Collect forest goods (NTFPs) | Agriculture/Agricultural - self employed | Subsistence Fishers, Hunters, Trappers and Gatherers | 6340 |
+| Animal husbandry | Agriculture/Agricultural - self employed | Subsistence Livestock Farmers | 6320 |
+| Trader | Sales | Street and Related Sales and Service Workers | 95 |
+| Artisan/Handiwork/Carpenter | Skilled manual | Craft and Related Trades Workers | 7 |
+| Driver | Other | Car, Van and Motorcycle Drivers | 832 |
+| Teacher | Professional/technical/managerial | Teaching Professionals | 23 |
+| Clergy (minister, pastor) | Professional/technical/managerial | Social and Religious Professionals | 263 |
+| Student | Not working/NA/Did not work | N/A | N/A |
+| Government worker | Clerical/Professional/technical/managerial | Business and Administration Associate Professionals | 33 |
+| Pensioner | Not working/NA/Did not work | N/A | N/A |
+| Other | Unskilled manual/Services | Elementary Occupations | 9 | 
+
+::: {.panel-tabset}
+
+#### Benue
+
+DHS sample: N = 1,634 (Female = 1,278; Male = 356), median age = 28 (Female = 27, Male = 32).
+
+```{r dhs-occupation-benue}
+nigeria_dhs <- read_rds(here("data", "additional", "nigeria_dhs.rds"))
+
+generate_occupation_plot <- function(state_name) {
+   
+   if(state_name == "Nigeria") state_name = str_c(unique(nigeria_dhs$state), collapse = "|")
+   
+   dhs_state <- nigeria_dhs %>%
+      filter(str_detect(state, state_name)) %>%
+      group_by(sex, isco) %>%
+      summarise(n = n()) %>%
+      group_by(sex) %>%
+      mutate(
+         percent = round(n / sum(n) * 100, 1),
+         isco = fct_relevel(fct_na_value_to_level(fct_rev(as_factor(isco)), level = NA), NA, after = 0)
+      )
+   
+   dhs_state_rural_urban <- nigeria_dhs %>%
+      filter(str_detect(state, state_name)) %>%
+      group_by(sex, setting, isco) %>%
+      summarise(n = n()) %>%
+      group_by(sex, setting) %>%
+      mutate(
+         percent = round(n / sum(n) * 100, 1),
+         isco = fct_relevel(fct_na_value_to_level(fct_rev(as_factor(isco)), level = NA), NA, after = 0)
+      )
+   
+   occupation_plot <- dhs_state %>%
+      ggplot(aes(x = sex, fill = isco, y = percent, label = paste0(percent, "%"))) +
+      geom_col() +
+      geom_text_repel(
+         position = position_stack(vjust = 0.5),
+         box.padding = 0.5,
+         point.padding = 0.1,
+         segment.color = "grey",
+         segment.size = 0.2
+      ) +
+      scale_fill_brewer(palette = "Dark2", na.value = "grey50") +
+      theme_bw() +
+      labs(
+         y = "%",
+         x = element_blank(),
+         fill = "Occupation"
+      )
+   
+   occupation_rural_urban_plot <- dhs_state_rural_urban %>%
+      ggplot(aes(x = sex, fill = isco, y = percent, label = paste0(percent, "%"))) +
+      geom_col() +
+      geom_text_repel(
+         position = position_stack(vjust = 0.5),
+         box.padding = 0.5,
+         point.padding = 0.1,
+         segment.color = "grey",
+         segment.size = 0.2
+      ) +
+      scale_fill_brewer(palette = "Dark2", na.value = "grey50") +
+      facet_wrap(~ setting, scales = "free", ncol = 2) +
+      theme_bw() +
+      labs(
+         y = "%",
+         x = element_blank(),
+         fill = "Occupation"
+      ) +
+      guides(fill = "none")
+   
+   return(list(occupation_plot, occupation_rural_urban_plot))
+}
+
+benue_occupation <- generate_occupation_plot("Benue")
+benue_occupation[[1]]
+benue_occupation[[2]]
+```
+
+
+#### Cross River
+
+DHS sample: N = 949 (Female = 748; Male = 201), median age = 31 (Female = 30, Male = 34).
+
+``` {r dhs-occupation-cross-river}
+
+cr_occupation <- generate_occupation_plot("Cross River")
+cr_occupation[[1]]
+cr_occupation[[2]]
+
+```
+
+#### Ebonyi
+
+DHS sample: N = 1,666 (Female = 1,310; Male = 356), median age = 31 (Female = 29, Male = 37).
+
+``` {r dhs-occupation-ebonyi}
+
+ebonyi_occupation <- generate_occupation_plot("Ebonyi")
+ebonyi_occupation[[1]]
+ebonyi_occupation[[2]]
+
+```
+
+
+#### Nigeria
+
+DHS sample: N = 55,132 (Female = 41,821; Male = 13,331), median age = 29 (Female = 28, Male = 32).
+
+``` {r dhs-occupation-nigeria}
+
+nigeria_occupation <- generate_occupation_plot("Nigeria")
+nigeria_occupation[[1]]
+nigeria_occupation[[2]]
+
+```
+
+:::
+
 ### Education
 
+::: {.panel-tabset}
+
+#### Benue
+
+```{r dhs-education-benue}
+
+generate_education_plot <- function(state_name) {
+   
+   if(state_name == "Nigeria") state_name = str_c(unique(nigeria_dhs$state), collapse = "|")
+   
+   dhs_state <- nigeria_dhs %>%
+      filter(str_detect(state, state_name)) %>%
+      group_by(sex, education) %>%
+      summarise(n = n()) %>%
+      group_by(sex) %>%
+      mutate(
+         percent = round(n / sum(n) * 100, 1),
+         education = fct_rev(education)
+      )
+   
+   dhs_state_rural_urban <- nigeria_dhs %>%
+      filter(str_detect(state, state_name)) %>%
+      group_by(sex, setting, education) %>%
+      summarise(n = n()) %>%
+      group_by(sex, setting) %>%
+      mutate(
+         percent = round(n / sum(n) * 100, 1),
+         education = fct_rev(education)
+      )
+   
+   education_plot <- dhs_state %>%
+      ggplot(aes(x = sex, fill = education, y = percent, label = paste0(percent, "%"))) +
+      geom_col() +
+      geom_text_repel(
+         position = position_stack(vjust = 0.5),
+         box.padding = 0.5,
+         point.padding = 0.1,
+         segment.color = "grey",
+         segment.size = 0.2
+      ) +
+      scale_fill_brewer(palette = "Set3", na.value = "grey50") +
+      theme_bw() +
+      labs(
+         y = "%",
+         x = element_blank(),
+         fill = "Education"
+      )
+   
+   education_rural_urban_plot <- dhs_state_rural_urban %>%
+      ggplot(aes(x = sex, fill = education, y = percent, label = paste0(percent, "%"))) +
+      geom_col() +
+      geom_text_repel(
+         position = position_stack(vjust = 0.5),
+         box.padding = 0.5,
+         point.padding = 0.1,
+         segment.color = "grey",
+         segment.size = 0.2
+      ) +
+      scale_fill_brewer(palette = "Set3", na.value = "grey50") +
+      facet_wrap(~ setting, scales = "free", ncol = 2) +
+      theme_bw() +
+      labs(
+         y = "%",
+         x = element_blank(),
+         fill = "Education"
+      ) +
+      guides(fill = "none")
+   
+   return(list(education_plot, education_rural_urban_plot))
+   
+}
+
+benue_education <- generate_education_plot("Benue")
+benue_education[[1]]
+benue_education[[2]]
+
+```
+
+
+#### Cross River
+
+```{r dhs-education-cross-river}
+
+cr_education <- generate_education_plot("Cross River")
+cr_education[[1]]
+cr_education[[2]]
+
+```
+
+#### Ebonyi
+
+```{r dhs-education-ebonyi}
+
+ebonyi_education <- generate_education_plot("Ebonyi")
+ebonyi_education[[1]]
+ebonyi_education[[2]]
+
+```
+
+#### Nigeria
+
+```{r dhs-education-nigeria}
+
+nigeria_education <- generate_education_plot("Nigeria")
+nigeria_education[[1]]
+nigeria_education[[2]]
+
+```
+
+
+
+:::
+
+
 ### Socioeconomic
+
+This section will contain a comparison of household wealth and perhaps household building structures.
