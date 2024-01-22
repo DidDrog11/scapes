@@ -1,5 +1,4 @@
 #username = "ds1987"
-#password = "3iK26CP!mfH&-5C"
 #url = "https://kf.kobotoolbox.org/"
 
 #kobo_token(username = username,
