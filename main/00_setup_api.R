@@ -1,10 +1,10 @@
-username = "ds1987"
-password = "3iK26CP!mfH&-5C"
-url = "https://kf.kobotoolbox.org/"
+#username = "ds1987"
+#password = "3iK26CP!mfH&-5C"
+#url = "https://kf.kobotoolbox.org/"
 
-kobo_token(username = username,
-           password = password,
-           url = url)
+#kobo_token(username = username,
+#           password = password,
+#           url = url)
 
 # usethis::edit_r_environ(scope = "project")
 
@@ -26,4 +26,11 @@ SCAPES_i_id <- kobo_library %>%
   filter(name == "SCAPES - Individual") %>%
   pull(uid)
 
-SCAPES_i_submissions <- get_subs(uid = SCAPES_i_id)
+SCAPES_i_submissions <- kobo_asset(SCAPES_i_id)
+
+SCAPES_i_dm <- kobo_data(SCAPES_i_submissions)
+
+dm_draw(SCAPES_i_dm)
+
+write_rds(SCAPES_i_dm, file = here("data", "i_data", paste0("i_data_dm_", Sys.Date(), ".rds")))
+
