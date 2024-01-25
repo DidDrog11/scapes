@@ -1,26 +1,27 @@
 if (!require("pacman")) install.packages("pacman")
 
-pkgs <- c(
-  "googledrive",
-  "robotoolbox",
-  "crul",
-  "cowplot",
-  "glue",
-  "ggrepel",
-  "RcppSimdJson",
-  "httr",
-  "dm",
-  "DT",
-  "haven",
-  "here",
-  "tidyverse",
-  "readxl",
-  "viridisLite",
-  "geodata",
-  "terra",
-  "crayon",
-  "knitr"
-)
+pkgs <- c("cowplot",
+          "crayon",
+          "crul",
+          "dm",
+          "DT",
+          "forcats",
+          "geodata",
+          "ggrepel",
+          "glue",
+          "googledrive",
+          "haven",
+          "here",
+          "httr",
+          "janitor",
+          "kableExtra",
+          "knitr",
+          "RcppSimdJson",
+          "readxl",
+          "robotoolbox",
+          "terra",
+          "tidyverse",
+          "viridisLite")
 
 pacman::p_load(pkgs, character.only = T)
 
@@ -29,6 +30,7 @@ utm_nigeria_CRS = "EPSG:26332"
 
 village_state = tibble(abbreviation = c("zug", "dye", "iky", "oki", "oga", "ofo", "eze", "eny", "off"),
                        village = c("Zugu", "Dyegh", "Ikyogbakpev", "Okimbongha", "Ogamanna", "Ofonekom", "Ezeakataka", "Enyandulogu", "Offianka"),
+                       lga = c("Vandeikya", "Vandeikya", "Vandeikya", "Obubura", "Obubura", "Obubura", "Izzi", "Izzi", "Izzi"),
                        state = c("Benue", "Benue", "Benue", "Cross River", "Cross River", "Cross River", "Ebonyi", "Ebonyi", "Ebonyi"))
 
 # Number of states and villages per state
@@ -84,3 +86,9 @@ occupation_matching <- data.frame(
                 "Business and Administration Associate Professionals", "N/A", "N/A"),
   "ISCO-08 code" = c(6111, 631, 631, 6340, 6340, 6340, 6340, 6320, 95, 7, 832, 23, 263, NA, 33, NA, NA)
 )
+
+nigeria_states <- c("Abia", "Adamawa", "Akwa Ibom", "Anambra", "Bauchi", "Bayelsa", "Benue", "Borno", 
+                    "Cross-River", "Delta", "Ebonyi", "Edo", "Ekiti", "Enugu", "Gombe", "Imo", "Jigawa", 
+                    "Kaduna", "Kano", "Katsina", "Kebbi", "Kogi", "Kwara", "Lagos", "Nasarawa", "Niger", 
+                    "Ogun", "Ondo", "Osun", "Oyo", "Plateau", "Rivers", "Sokoto", "Taraba", "Yobe", "Zamfara",
+                    "Federal Capital Territory")

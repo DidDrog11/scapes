@@ -7,7 +7,6 @@ check_unique_id <- function(df =  hh_df_list$household_main) {
  
   if(nrow(df) == length(unique(df$household_id))) message(crayon::green("All household IDs are unique"))
   
-  return(df)
 }
 
 check_unique_id(df =  hh_df_list$household_main)

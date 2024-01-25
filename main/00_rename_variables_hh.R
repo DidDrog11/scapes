@@ -1,7 +1,8 @@
 
 # Import questionnaire ----------------------------------------------------
 drive_download("https://docs.google.com/spreadsheets/d/1YVVEsuOYtSrbmsW-Z30TvXHQWtTWgKre/edit?usp=sharing&ouid=109198876678825407497&rtpof=true&sd=true",
-               path = here("questionnaire", "hh_questionnaire_current.xlsx"))
+               path = here("questionnaire", "hh_questionnaire_current.xlsx"),
+               overwrite = TRUE)
 
 h_questions <- read_xlsx(path = here("questionnaire", "hh_questionnaire_current.xlsx"))
 
