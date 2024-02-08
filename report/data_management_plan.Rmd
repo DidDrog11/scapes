@@ -1,0 +1,1087 @@
+---
+title: "SCAPES - Data Management Plan"
+author: "David Simons"
+date: "2024-02-05"  # Replace with the current date
+output:
+  pdf_document:
+    includes:
+      in_header: styles.tex
+---
+
+# Qualitative data
+
+## Participatory Rural Assessment
+
+How will data be collected?\
+What form will this data take?\
+How/where will it be stored?\
+What will the data include?\
+What are the variables/parameters of the data?\
+How will data be cleaned/processed?\
+How will the data be anonymised/participants protected? Will data be shared? If so, how?
+
+# Quantitative data
+
+## Community questionnaires
+
+Questionnaires have been designed as XLSForms and are implemented using the Kobo platform. Data is collected on local devices and sent to the KoboToolbox server (<https://kf.kobotoolbox.org/>) for the SCAPES project. Access can be provided for data entry, modification and download. An unprocessed data set can be downloaded directly from the KoboToolbox server.
+
+Alternatively, a project has been created to pull the data and format it using R.
+
+### R Repository for data processing
+
+The `robotoolbox` R package is used to download the data locally through the Kobo API. This approach uses the `dm` R package to handle the grouped repeats in the questionnaire and the `haven` R package to handle variable structure (e.g., labelled factors).
+
+### Household questionnaires:
+
+#### Household questionnaire variables and responses
+
+**Variable Name:** `start`
+
+**Description:** Formatted datetime when the questionnaire entry was created.
+
+**Type of Data:** Datetime
+
+------------------------------------------------------------------------
+
+**Variable Name:** `end`
+
+**Description:** Formatted datetime when the questionnaire date entry was completed. This may not equate to the length of data collection as data may be added later (e.g., images).
+
+**Type of Data:** Datetime
+
+------------------------------------------------------------------------
+
+**Variable Name:** `date`
+
+**Description:** Likely not needed but was used for internal questionnaire logic. Similar to end in that it records the date of the most recent data entry in the form.
+
+**Type of Data:** Date
+
+**Format:** %Y\_%m\_%d
+
+------------------------------------------------------------------------
+
+**Variable Name:** `interviewer_id`
+
+**Description:** Name of the interviewer who conducted the interview.
+
+**Type of Data:** Factor with labels associated with values.
+
+**Options for Responses:**
+
+-   Option 1: Diana (Code: 1)
+-   Option 2: Helen (Code: 2)
+-   Option 3: Nzube (Code: 3)
+-   Option 4: Sunday (Code: 4)
+-   Option 5: Other (Code: 5)
+
+**Relationships with other variables:** `interviewer_id_other` contains the free-text entry if other is selected.
+
+------------------------------------------------------------------------
+
+**Variable Name:** `community`
+
+**Description:** Community questionnaire was conducted in.
+
+**Type of Data:** Factor with labels associated with values.
+
+**Options for Responses:**
+
+-   Option 1: Dyegh (Akwa Kwasi) (Code: dyegh)
+-   Option 2: Ikyogbakpev (Akwa Kwasi) (Code: ikyogbakpev)
+-   Option 3: Zugu (Code: zugu)
+-   Option 4: Okimbongha (Code: okimbongha)
+-   Option 5: Ogamanna (Code: ogamanna)
+-   Option 6: Ofonekom (Code: ofonekom)
+-   Option 7: Ezeakataka (Code: ezeakataka)
+-   Option 8: Enyandulogu (Code: enyandulogu)
+-   Option 9: Offianka (Code: offianka)
+
+------------------------------------------------------------------------
+
+**Variable Name:** `consent_household`
+
+**Description:** Whether consent for data collection has been provided.
+
+**Type of Data:** Binary
+
+**Options for Responses:**
+
+-   Yes (Code: 1)
+-   No (Code: 0)
+
+------------------------------------------------------------------------
+
+**Variable Name:** `household_number`
+
+**Description:** Identification number of the household this questionnaire pertains to.
+
+**Type of Data:** Integer
+
+**Validation Rules:** Combined with community to produce a unique identifier for a household. Data validation during processing to ensure each household is uniquely identified.
+
+------------------------------------------------------------------------
+
+**Variable Name:** `multiple_family_household`
+
+**Description:** Are members from this household all from the same family? See protocol for definitions used for household and family.
+
+**Type of Data:** Integer
+
+------------------------------------------------------------------------
+
+**Variable Name:** `n_people`
+
+**Description:** The number of individuals currently living within the household. Includes those who come and go on a regular basis or are current students away for school.
+
+**Type of Data:** Integer
+
+\mydoublerule{}
+
+#### Repeat Section: Household members demographic will be repeated for each member of the household
+
+**Variable Name:** `sex_person`
+
+**Description:** The sex of the individual.
+
+**Type of Data:** Binary
+
+**Options for Responses:**
+
+-   Female (Code: 1)
+-   Male (Code: 0)
+
+------------------------------------------------------------------------
+
+**Variable Name:** `baby`
+
+**Description:** Are they less than 1 year old?
+
+**Type of Data:** Binary (Yes or No)
+
+**Options for Responses:**
+
+-   Yes (Code: 1)
+-   No (Code: 0)
+
+------------------------------------------------------------------------
+
+**Variable Name:** `age_person`
+
+**Description:** The age of the individual, in years. Only asked for those \>1 year old.
+
+**Type of Data:** Integer
+
+------------------------------------------------------------------------
+
+**Variable Name:** `age_baby`
+
+**Description:** The age of the individual in months. Only asked for those \<1 year old.
+
+**Type of Data:** Integer
+
+------------------------------------------------------------------------
+
+**Variable Name:** `permanent_transient`
+
+**Question:** In the last year, was this individual regularly resident within this household?
+
+**Type of Data:** Binary (Yes or No)
+
+**Options for Responses:**
+
+-   Yes (Code: 1)
+-   No (Code: 0)
+
+*End of household member repeat*
+
+\mydoublerule{}
+
+**Variable Name:** `compound`
+
+**Question:** Is this household within a compound?
+
+**Description:** A compound can be an enclosed area. A compound can also be a clear but defined area.
+
+**Type of Data:** Binary (Yes or No)
+
+**Options for Responses:**
+
+-   Yes (Code: 1)
+-   No (Code: 0)
+
+------------------------------------------------------------------------
+
+**Variable Name:** `multiple_households`
+
+**Question:** Do any other households live in the same compound?
+
+**Description:** Only asked if the answer to the `compound` question is Yes.
+
+**Type of Data:** Binary (Yes or No)
+
+**Options for Responses:**
+
+-   Yes (Code: 1)
+-   No (Code: 0)
+
+------------------------------------------------------------------------
+
+**Variable Name:** `n_in_other_households`
+
+**Question:** How many people live in this compound?
+
+**Description:** Not including those that are in the focal household. Only asked if the answer to the `multiple_households` question is Yes.
+
+**Type of Data:** Integer
+
+------------------------------------------------------------------------
+
+**Variable Name:** `other_household_activities`
+
+**Question:** Which of the following activities occur regularly with these other households?
+
+**Description:** Only asked if the answer to the `multiple_households` question is Yes.
+
+**Type of Data:** Factor with labels associated with values.
+
+**Options for Responses:**
+
+-   Option 1: Sleeping (Code: sleeping)
+-   Option 2: Eating (Code: eating)
+-   Option 3: Cooking (Code: cooking)
+-   Option 4: Hunting (Code: hunting)
+-   Option 5: Farming (Code: farming)
+-   Option 6: None (Code: none)
+-   Option 7: Other (Code: other)
+
+------------------------------------------------------------------------
+
+**Variable Name:** `other_household_activities_specify`
+
+**Description:** Captures other activities which may be conducted with the focal household only if other is selected in `other_household_activities`
+
+**Type of Data:** Free text
+
+------------------------------------------------------------------------
+
+**Variable Name:** `household_ethnicity_same`
+
+**Question:** Do all members of this household identify as the same ethnicity?
+
+**Type of Data:** Binary (Yes or No)
+
+**Options for Responses:**
+
+-   Yes (Code: 1)
+-   No (Code: 0)
+
+------------------------------------------------------------------------
+
+**Variable Name:** `household_ethnicity`
+
+**Question:** What ethnicity is the household?
+
+**Description:** Only asked if the answer to the `household_ethnicity_same` question is Yes.
+
+**Type of Data:** Factor with labels associated with values.
+
+**Options for Responses:**
+
+-   Option 1: Igbo (Izzi) (Code: igbo_izzi)
+-   Option 2: Igbo (Other) (Code: igbo_other)
+-   Option 3: Membe (Code: membe)
+-   Option 4: Tiv (Code: tiv)
+-   Option 5: Other (Code: other)
+
+------------------------------------------------------------------------
+
+**Variable Name:** `other_ethnicity_household`
+
+**Description:** Only asked if the answer to `household_ethnicity` is other
+
+**Type of Data:** Free-text
+
+------------------------------------------------------------------------
+
+**Variable Name:** `household_religion_same`
+
+**Question:** Do all members of this household share the same religion?
+
+**Type of Data:** Binary (Yes or No)
+
+**Options for Responses:**
+
+-   Yes (Code: 1)
+-   No (Code: 0)
+
+------------------------------------------------------------------------
+
+**Variable Name:** `household_religion`
+
+**Question:** What religion is the household?
+
+**Description:** Factor with labels associated with values.
+
+**Options for Responses:**
+
+-   Option 1: Christian (Code: christian)
+-   Option 2: Muslim (Code: muslim)
+-   Option 3: Traditionalist (Code: traditionalist)
+-   Option 4: Other (Code: other)
+
+------------------------------------------------------------------------
+
+**Variable Name:** `household_religion_other`
+
+**Description:** Only asked if the answer to `household_religion` is other
+
+**Type of Data:** Free-text
+
+------------------------------------------------------------------------
+
+**Variable Name:** `n_compound`
+
+**Question:** How many buildings or other structures are there in the compound?
+
+**Description:** This variable represents the count of buildings or other structures within the compound.
+
+**Type of Data:** Integer
+
+------------------------------------------------------------------------
+
+**Variable Name:** `n_individual_buildings`
+
+**Question:** How many individual buildings does the household use regularly?
+
+**Description:** This variable represents the count of individual buildings regularly used by the household.
+
+**Type of Data:** Integer
+
+------------------------------------------------------------------------
+
+**Variable Name:** `building_owned`
+
+**Question:** Are these buildings owned by your household?
+
+**Description:** This variable indicates whether the buildings are owned by the household.
+
+**Type of Data:** Factor with labels associated with values.
+
+**Options for Responses:**
+
+-   Option 1: Own themselves (Code: own_themselves)
+-   Option 2: Owned by other members of the family (Code: own_family)
+-   Option 3: Rented from a non-family member (Code: rented)
+-   Option 4: Other (Code: other)
+
+------------------------------------------------------------------------
+
+**Variable Name:** `building_owned_other`
+
+**Description:** This question appears if other is selected in `building_owned`
+
+**Type of Data:** Free-text
+
+------------------------------------------------------------------------
+
+**Variable Name:** `n_multi_room`
+
+**Question:** How many multi-room buildings does this household regularly use?
+
+**Description:** This variable represents the count of multi-room buildings regularly used by the household.
+
+**Type of Data:** Integer
+
+------------------------------------------------------------------------
+
+**Variable Name:** `n_single_room`
+
+**Question:** How many single-room buildings does this household regularly use?
+
+**Type of Data:** Integer
+
+\mydoublerule{}
+
+#### Repeat Section: Multiroom buildings will be added, one per repeat
+
+**Variable Name:** `building_purpose`
+
+**Question:** What does the household use this building for?
+
+**Description:** For each building used by a household this variable captures information on what purpose it is used for.
+
+**Type of Data:** Character with each option in a string separated by a space
+
+**Options for Responses:**
+
+-   Option 1: Sleeping (Code: sleeping)
+-   Option 2: Food preparation (Code: food_preparation)
+-   Option 3: Cooking (Code: cooking)
+-   Option 4: Eating (Code: eating)
+-   Option 5: Socialising/Parlour (Code: socialising_parlour)
+-   Option 6: Cooked food storage (Code: food_storage)
+-   Option 7: Packaged food storage (Noodle, Indomie etc.)
+ (Code: packaged_food_storage)
+-   Option 8: Crop storage (Garri, Rice, Yam etc.)
+ (Code: crop_storage)
+-   Option 9: Seed storage (Code: seed_storage)
+-   Option 10: Animal storage (Chicken, Goat etc.)
+ (Code: animal_storage)
+-   Option 11: Other storage (Code: other_storage)
+-   Option 12: Other (Code: other)
+
+------------------------------------------------------------------------
+
+**Variable Name:** `specify_building_purpose`
+
+**Description:** Only asked if other is selected as one of the options in `building_purpose`
+
+**Type of Data:** Free-text
+
+------------------------------------------------------------------------
+
+**Variable Name:** `building_location`
+
+**Question:** Where is the building located?
+
+**Type of Data:** Factor with labels associated with values
+
+**Options for Responses:**
+
+-   Option 1: Within the compound (Code: compound)
+-   Option 2: No compound, within the village (Code: no_compound)
+-   Option 3: Elsewhere in the village, outside of the compound (Code: village)
+-   Option 4: In the field, outside of the compound (Code: fields)
+-   Option 5: In a different village (Code: other_village)
+-   Option 6: In a different town/city (Code: in_town)
+-   Option 7: Other (Code: other)
+
+------------------------------------------------------------------------
+
+**Variable Name:** `specify_building_location`
+
+**Description:** Only asked if other is selected as the option in `building_location`
+
+**Type of Data:** Free-text
+
+------------------------------------------------------------------------
+
+**Variable Name:** `roof_material`
+
+**Question:** What is the roof made of?
+
+**Type of Data:** Character with each option in a string separated by a space
+
+**Options for Responses:**
+
+-   Option 1: Mat/thatch (Code: mat_thatch)
+-   Option 2: Zinc/metal (Code: zinc_metal)
+-   Option 3: Deck  (Code: deck)
+-   Option 4: None (Code: none)
+-   Option 5: Other (Code: other)
+
+**Definitions:**  
+
+-   Roof - refers to external material of the roof
+-   Deck - ...
+
+------------------------------------------------------------------------
+
+**Variable Name:** `roof_other`
+
+**Description:** Only asked if other is selected as the option in `roof_material`
+
+**Type of Data:** Free-text
+
+------------------------------------------------------------------------
+
+**Variable Name:** `wall_material`
+
+**Question:** What are the walls made of?
+
+**Type of Data:** Character with each option in a string separated by a space
+
+**Options for Responses:**
+
+-   Option 1: Mud block (Code: mud_block)
+-   Option 2: Brick (Code: brick)
+-   Option 3: Cement blocks (Code: cement_block)
+-   Option 4: Plaster (Code: plaster)
+-   Option 5: Wood (Slats, Lumber etc.) (Code: wood)
+-   Option 6: Trees/Sticks (Code: wood_other)
+-   Option 7: Other (Code: other)
+
+**Definitions:**  
+
+-   Mud block - an unfired mud block
+-   Brick - a fired block
+-   Plaster - ...
+
+------------------------------------------------------------------------
+
+**Variable Name:** `walls_other`
+
+**Description:** Only asked if other is selected as the option in `wall_material`
+
+**Type of Data:** Free-text
+
+------------------------------------------------------------------------
+
+**Variable Name:** `door_material`
+
+**Question:** What is the door of the main entrance made of?
+
+**Type of Data:** Select one
+
+**Options for Responses:**
+
+-   Option 1: Wood (Code: wood)
+-   Option 2: Metal (Code: metal)
+-   Option 3: None (Code: none)
+-   Option 4: Other (Code: other)
+
+------------------------------------------------------------------------
+
+**Variable Name:** `door_other`
+
+**Description:** Only asked if other is selected as the option in `door_material`
+
+**Type of Data:** Free-text
+
+------------------------------------------------------------------------
+
+**Variable Name:** `window_material`
+
+**Question:** What are the windows made of?
+
+**Type of Data:** Character with each option in a string separated by a space
+
+**Options for Responses:**
+
+-   Option 1: Permanently open (Code: permanently_open)
+-   Option 2: Permanently closed (Code: permanently_closed)
+-   Option 3: Wooden shutters (Code: wooden_shutters)
+-   Option 4: Glass panes (Code: glass)
+-   Option 5: Mosquito net (Code: screen)
+-   Option 6: Metal grill/sheet (Code: metal)
+-   Option 7: No windows (Code: none)
+-   Option 8: Other (Code: other)
+
+------------------------------------------------------------------------
+
+**Variable Name:** `specify_window`
+
+**Description:** Only asked if other is selected as the option in `window_material`
+
+**Type of Data:** Free-text
+
+------------------------------------------------------------------------
+
+**Variable Name:** `ceiling_material`
+
+**Question:** What material is used for the ceiling?
+
+**Type of Data:** Character with each option in a string separated by a space
+
+**Options for Responses:**
+
+-   Option 1: Mat/thatch (Code: mat_thatch)
+-   Option 2: Wood (Code: wood)
+-   Option 3: Cement (Code: cement)
+-   Option 4: Synthetic (Code: synthetic)
+-   Option 5: Sack bag/Carpet/Lino (Code: lining)
+-   Option 6: No ceiling (Code: no_ceiling)
+-   Option 7: Other (Code: other)
+
+**Definitions:**  
+
+-   Sack bag/Carpet/Lino - ...
+
+------------------------------------------------------------------------
+
+**Variable Name:** `specify_ceiling`
+
+**Description:** Only asked if other is selected as the option in `ceiling_material`
+
+**Type of Data:** Free-text
+
+------------------------------------------------------------------------
+
+**Variable Name:** `ceiling_storage`
+
+**Question:** Is there anything stored between the ceiling and the roof?
+
+**Type of Data:** Binary (yes/no)
+
+**Options for Responses:**
+
+-   Yes (Code: 1)
+-   No (Code: 0)
+
+------------------------------------------------------------------------
+
+**Variable Name:** `storage_items_ceiling`
+
+**Question:** What is stored in this space?
+
+**Type of Data:** Character with each option in a string separated by a space
+
+**Options for Responses:**
+
+-   Option 1: Cooked food (Code: cooked_food)
+-   Option 2: Uncooked food (Code: uncooked_food)
+-   Option 3: Packaged food (Code: packaged_food)
+-   Option 4: Crops for sale (Code: crops_for_sale)
+-   Option 5: Crops for household use (Code: crops_for_household_use)
+-   Option 6: Seeds for sale (Code: seeds_for_sale)
+-   Option 7: Seeds for household use (Code: seeds_for_household_use)
+-   Option 8: Clothing (Code: clothing)
+-   Option 9: Other (Code: other)
+
+------------------------------------------------------------------------
+
+**Variable Name:** `ceiling_storage_other`
+
+**Description:** Only asked if other is selected as the option in `storage_items_ceiling`
+
+**Type of Data:** Free-text
+
+------------------------------------------------------------------------
+
+**Variable Name:** `floor`
+
+**Question:** What is the floor made of?
+
+**Type of Data:** Character with each option in a string separated by a space
+
+**Options for Responses:**
+
+-   Option 1: Mud (Code: mud)
+-   Option 2: Cement (Code: cement)
+-   Option 3: Tile (Code: tile)
+-   Option 4: Other (Code: other)
+
+------------------------------------------------------------------------
+
+**Variable Name:** `internal_door`
+
+**Question:** Are there doors between the rooms in the building?
+
+**Description:** This variable indicates whether there are doors between the rooms in the building.
+
+**Type of Data:** Single-select with binary responses.
+
+**Options for Responses:**
+
+-   Yes (Code: 1)
+-   No (Code: 0)
+
+---
+
+**Variable Name:** `internal_door_fit`
+
+**Question:** Do the doors fit well within the building?
+
+**Description:** This variable indicates whether the doors fit well within the building. i.e., If your finger can fit through any space in the door, or between the door and the frame, it does not fit well.
+
+**Type of Data:** Single-select with binary responses.
+
+**Options for Responses:**
+
+-   Yes (Code: 1)
+-   No (Code: 0)
+
+---
+
+**Variable Name:** `rooms_in_building`
+
+**Question:** How many rooms are there in this building?
+
+**Description:** This variable captures the number of rooms within the same building, including kitchens, bedrooms, storerooms, parlors, etc.
+
+**Type of Data:** Integer
+
+---
+
+**Variable Name:** `n_household_sleep`
+
+**Question:** How many people from this household sleep in this building?
+
+**Description:** This variable indicates the number of people from this household who sleep in this building.
+
+**Type of Data:** Integer
+
+---
+
+**Variable Name:** `sleep_same_room`
+
+**Question:** Does everyone from this household that sleeps in this building sleep in the same room?
+
+**Description:** This variable indicates whether everyone from this household who sleeps in this building sleeps in the same room.
+
+**Type of Data:** Single-select with binary responses.
+
+**Options for Responses:**
+
+-   Yes (Code: 1)
+-   No (Code: 0)
+
+---
+
+**Variable Name:** `n_rooms_household_sleep`
+
+**Question:** How many different rooms do people from this household sleep in?
+
+**Description:** This variable captures the number of different rooms in which people from this household sleep.
+
+**Type of Data:** Integer
+
+---
+
+**Variable Name:** `other_household_sleep`
+
+**Question:** Do members of a different household sleep in this building?
+
+**Description:** This variable indicates whether members of a different household sleep in this building.
+
+**Type of Data:** Single-select with binary responses.
+
+**Options for Responses:**
+
+-   Yes (Code: 1)
+-   No (Code: 0)
+
+---
+
+**Variable Name:** `other_household_sleep_shared`
+
+**Question:** Do members of a different household sleep in the same space/place as members of this household?
+
+**Description:** This variable indicates whether members of a different household sleep in the same space/place as members of this household.
+
+**Type of Data:** Single-select with binary responses.
+
+**Options for Responses:**
+
+-   Yes (Code: 1)
+-   No (Code: 0)
+
+---
+
+**Variable Name:** `n_other_household_sleep_multi`
+
+**Question:** How many members of a different household sleep in this building?
+
+**Description:** This variable captures the number of members of a different household who sleep in this building.
+
+**Type of Data:** Integer
+
+---
+
+**Variable Name:** `rodents_enter_building`
+
+**Question:** Do any rats enter this building?
+
+**Description:** This variable indicates whether any rats are known to enter this building.
+
+**Type of Data:** Single-select with three responses
+
+**Options for Responses:**
+
+-   Option 1: Yes (Code: yes)
+-   Option 2: No (Code: no)
+-   Option 3: Unknown (Code: unknown)
+
+---
+
+**Variable Name:** `rodents_in_building`
+
+**Question:** Do any rats live in this building?
+
+**Description:** This variable indicates whether any rats are known to live in this building.
+
+**Type of Data:** Single-select with three responses 
+
+**Options for Responses:**
+
+-   Option 1: Yes (Code: yes)
+-   Option 2: No (Code: no)
+-   Option 3: Unknown (Code: unknown)
+
+---
+
+**Variable Name:** `rodents_in_building_evidence`
+
+**Question:** How do you know rats live here?
+
+**Description:** This variable captures the evidence of rats living in the building.
+
+**Type of Data:** Multi-select
+
+**Options for Responses:**
+
+-   Option 1: See live rats (Code: see_live_rats)
+-   Option 2: See dead rats (Code: see_dead_rats)
+-   Option 3: See rat urine (Code: see_rat_urine)
+-   Option 4: See rat faeces (Code: see_rat_faeces)
+-   Option 5: See rat burrows (Code: see_rat_burrows)
+-   Option 6: Hear them (Code: hear_them)
+-   Option 7: Smell them (Code: smell_them)
+-   Option 8: Direct contact with rats (Code: direct_contact)
+-   Option 9: Seen the damage they have done to items (Code: item_damage)
+-   Option 10: Other (Code: other)
+
+---
+
+**Variable Name:** `rodents_in_building_specify`
+
+**Question:** Please specify.
+
+**Description:** This variable allows for specifying other evidence of rats living in the building. Only asked if other is selected in `rodents_in_building_evidence`.
+
+**Type of Data:** Free text
+
+---
+
+**Variable Name:** `rodent_faeces_multi_sleep`
+
+**Question:** Do you ever see the excreta/shit of rats in the places where people sleep?
+
+**Description:** This variable indicates whether rat excreta are observed in sleeping areas.
+
+**Type of Data:** Single-select with three responses (Yes, No, Unknown)
+
+**Options for Responses:**
+
+-   Option 1: Yes (Code: yes)
+-   Option 2: No (Code: no)
+-   Option 3: Unknown (Code: unknown)
+
+---
+
+**Variable Name:** `rodent_sleeping_contact_multi`
+
+**Question:** Has anyone been bitten or scratched by a rat while sleeping in this building?
+
+**Description:** This variable indicates whether there has been any contact that could potentially result in direct pathogen transmission with rats while sleeping. Sleeping areas may not be the same thing as bedrooms as individuals may sleep in additional rooms of the building.
+
+**Type of Data:** Single-select with three responses (Yes, No, Unknown)
+
+**Options for Responses:**
+
+-   Option 1: Yes (Code: yes)
+-   Option 2: No (Code: no)
+-   Option 3: Unknown (Code: unknown)
+
+---
+
+**Variable Name:** `mastomys_multi`
+
+**Question:** Do you notice a rat called *Mastomys natalensis* (the multimammate rat, or the rat with many offspring) in this building?
+
+**Description:** This variable captures awareness of the presence of *Mastomys natalensis* in the building.
+
+**Type of Data:** Single-select with three responses (Yes, No, Unknown)
+
+**Options for Responses:**
+
+-   Option 1: Yes (Code: yes)
+-   Option 2: No (Code: no)
+-   Option 3: Unknown (Code: unknown)
+
+---
+
+**Variable Name:** `mastomys_timing_multi`
+
+**Question:** What time of the day do you see this rat?
+
+**Description:** This variable captures the timing of *Mastomys natalensis* sightings.
+
+**Type of Data:** Single-select
+
+**Options for Responses:**
+
+-   Option 1: Daytime (Code: daytime)
+-   Option 2: Nighttime (Code: nighttime)
+-   Option 3: Anytime (Code: anytime)
+
+---
+
+**Variable Name:** `mastomys_season_multi`
+
+**Question:** Which season do you see them in?
+
+**Description:** This variable captures the seasonality of *Mastomys natalensis* sightings.
+
+**Type of Data:** Single-select
+
+**Options for Responses:**
+
+-   Option 1: Dry (Code: dry)
+-   Option 2: Rainy (Code: rainy)
+-   Option 3: All seasons (Code: all_seasons)
+
+---
+
+**Variable Name:** `designated_kitchen`
+
+**Question:** Is there a room that is designated as the kitchen in this building?
+
+**Description:** This variable indicates whether there is a room designated as the kitchen in the building. Most kitchen activities occur outside but some preparation may occur within buildings or the kitchen may be attached to the building.
+
+**Type of Data:** Single-select with three responses (Yes, No, Unknown)
+
+**Options for Responses:**
+- Option 1: Yes (Code: yes)
+- Option 2: No (Code: no)
+- Option 3: Unknown (Code: unknown)
+
+---
+
+**Variable Name:** `sleep_in_kitchen`
+
+**Question:** Do people from this household regularly sleep in the room that is designated as the kitchen?
+
+**Description:** This variable captures whether individuals from the household regularly sleep in the room designated as the kitchen. Only asked if the answer to `designated_kitchen` is Yes.
+
+**Type of Data:** Single-select with three responses (Yes, No, Sometimes)
+
+**Options for Responses:**
+- Option 1: Yes (Code: yes)
+- Option 2: No (Code: no)
+- Option 3: Sometimes (Code: sometimes)
+
+---
+
+**Variable Name:** `n_sleep_in_kitchen`
+
+**Question:** How many individuals from this household sleep in the kitchen?
+
+**Description:** This variable indicates the number of individuals from the household who regularly sleep in the kitchen. Only asked if the answer to `sleep_in_kitchen` is Yes.
+
+**Type of Data:** Integer
+
+---
+
+**Variable Name:** `rodent_damage_kitchen`
+
+**Question:** Do rats eat or destroy food or ingredients in the kitchen?
+
+**Description:** This variable captures whether rats cause damage to food or ingredients in the kitchen. It considers the damage they do to household items stored within kitchens.
+
+**Type of Data:** Single-select with three responses (Yes, No, Unknown)
+
+**Options for Responses:**
+
+-   Option 1: Yes (Code: yes)
+-   Option 2: No (Code: no)
+-   Option 3: Unknown (Code: unknown)
+
+---
+
+**Variable Name:** `rodent_damage_kitchen_items`
+
+**Question:** What do rats eat or destroy in the kitchen?
+
+**Description:** This variable captures the items that rats eat or destroy in the kitchen.
+
+**Type of Data:** Multi-select
+
+**Options for Responses:** 
+
+-   Option 1: Prepared but uncooked food (Garri, Pounded Yam etc.) (Code: uncooked_food)
+-   Option 2: Other ingredients for cooking (Spices, Dried Fish etc.) (Code: ingredients)
+-   Option 3: Cooked food (Code: cooked_food)
+-   Option 4: Rice for cooking (Code: rice)
+-   Option 5: Yams for cooking (Code: yam)
+-   Option 6: Groundnut for cooking (Code: groundnut)
+-   Option 7: Other crops for cooking (Code: other_crops)
+
+---
+
+**Variable Name:** `specify_other_kitchen_items`
+
+**Question:** Please specify other items that rats eat or destroy in the kitchen.
+
+**Description:** This variable allows for specifying other items that rats may eat or destroy in the kitchen. This question is only asked if other_crops is selected in the `rodent_damage_kitchen_items`.
+
+**Type of Data:** Free-text
+
+**Options for Responses:** 
+-   
+
+---
+
+**Variable Name:** `prepared_food_damage`
+
+**Question:** How much of the prepared food kept in this kitchen is damaged?
+
+**Description:** This variable indicates the extent of damage to prepared but uncooked food kept in the kitchen by rats.
+
+**Type of Data:** Single-select with three responses.
+
+---
+
+**Variable Name:** `cooked_food_damage`
+
+**Question:** How much of the cooked food kept in this kitchen is damaged?
+
+**Description:** This variable indicates the extent of damage to cooked food kept in the kitchen by rats.
+
+**Type of Data:** Single-select with three responses (A bit (<25%), A lot (25-75%), Most (>75%))
+
+---
+
+**Variable Name:** `rice_damage`
+
+**Question:** How much of the rice kept in this kitchen is damaged?
+
+**Description:** This variable indicates the extent of damage to rice kept in the kitchen by rats.
+
+**Type of Data:** Single-select with three responses (A bit (<25%), A lot (25-75%), Most (>75%))
+
+---
+
+**Variable Name:** `yam_damage`
+
+**Question:** How much of the yam kept in this kitchen is damaged?
+
+**Description:** This variable indicates the extent of damage to yams kept in the kitchen by rats.
+
+**Type of Data:** Single-select with three responses (A bit (<25%), A lot (25-75%), Most (>75%))
+
+---
+
+**Variable Name:** `groundnut_damage`
+
+**Question:** How much of the groundnut kept in this kitchen is damaged?
+
+**Description:** This variable indicates the extent of damage to groundnuts kept in the kitchen by rats.
+
+**Type of Data:** Single-select with three responses (A bit (<25%), A lot (25-75%), Most (>75%))
+
+---
+
+**Variable Name:** `ingredients_damage`
+
+**Question:** How much of the other ingredients kept in this kitchen is damaged?
+
+**Description:** This variable indicates the extent of damage to other ingredients kept in the kitchen by rats.
+
+**Type of Data:** Single-select with three responses (A bit (<25%), A lot (25-75%), Most (>75%))
+
+
+
+### Individual questionnaires
+
+Linking IDs to samples?
+
+### Human serology
+
+### Rodent trapping
+
+### Rodent serology/PCR
+
+### Other

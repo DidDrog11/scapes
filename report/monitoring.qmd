@@ -61,7 +61,7 @@ Data is being collected from 9 villages across 3 states. This document is to mon
 styled_table <- datatable(
    village_state %>%
       rename_all(~str_to_sentence(str_replace_all(., "_", " "))) %>%
-      select(1:3),
+      select(Abbreviation, Village, Lga, State),
   escape = FALSE,
   options = list(
     dom = 't',
@@ -160,11 +160,11 @@ hh_sizes %>%
 
 ### Sex
 
-`r sex_composition_in_households$n_sex[sex_composition_in_households$sex == "female"]` females (`r sex_composition_in_households$prop_sex[sex_composition_in_households$sex == "female"]`) and `r sex_composition_in_households$n_sex[sex_composition_in_households$sex == "male"]` males (`r sex_composition_in_households$prop_sex[sex_composition_in_households$sex == "male"]`) are permanently or temporarily resident within these households. This compares to a 1.06 male/female ratio at birth (CIA World Factbook) and data from the DHS 2018 which suggests that women are more likely to reside in rural (54.2%) than urban (45.8%) settings and more so than males (53.6% rural vs. 46.4% urban).
+`r sex_composition_in_households$n_sex[sex_composition_in_households$sex == "female" & !is.na(sex_composition_in_households$sex)]` females (`r sex_composition_in_households$prop_sex[sex_composition_in_households$sex == "female" & !is.na(sex_composition_in_households$sex)]`) and `r sex_composition_in_households$n_sex[sex_composition_in_households$sex == "male" & !is.na(sex_composition_in_households$sex)]` males (`r sex_composition_in_households$prop_sex[sex_composition_in_households$sex == "male" & !is.na(sex_composition_in_households$sex)]`) are permanently or temporarily resident within these households. This compares to a 1.06 male/female ratio at birth (CIA World Factbook) and data from the DHS 2018 which suggests that women are more likely to reside in rural (54.2%) than urban (45.8%) settings and more so than males (53.6% rural vs. 46.4% urban).
 
 ### Age
 
-The sampled households have a median age of `r age_composition_in_households$median_age` (IQR = `r age_composition_in_households$iqr_age`) which compares to a median age of 19.2 (CIA World Factbook). Females within the households sampled have a median age of `r age_composition_sex_stratified$median_age[age_composition_sex_stratified$sex == "female"]` (IQR = `r age_composition_sex_stratified$iqr_age[age_composition_sex_stratified$sex == "female"]`) which compares to 19.4 for females from the CIA World Factbook. Males within sampled households have a median age of `r age_composition_sex_stratified$median_age[age_composition_sex_stratified$sex == "male"]` (IQR = `r age_composition_sex_stratified$iqr_age[age_composition_sex_stratified$sex == "male"]`) which compares to 18.9 for males from the CIA world Factbook.
+The sampled households have a median age of `r age_composition_in_households$median_age` (IQR = `r age_composition_in_households$iqr_age`) which compares to a median age of 19.2 (CIA World Factbook). Females within the households sampled have a median age of `r age_composition_sex_stratified$median_age[age_composition_sex_stratified$sex == "female" & !is.na(age_composition_sex_stratified$sex)]` (IQR = `r age_composition_sex_stratified$iqr_age[age_composition_sex_stratified$sex == "female" & !is.na(age_composition_sex_stratified$sex)]`) which compares to 19.4 for females from the CIA World Factbook. Males within sampled households have a median age of `r age_composition_sex_stratified$median_age[age_composition_sex_stratified$sex == "male" & !is.na(age_composition_sex_stratified$sex)]` (IQR = `r age_composition_sex_stratified$iqr_age[age_composition_sex_stratified$sex == "male" & !is.na(age_composition_sex_stratified$sex)]`) which compares to 18.9 for males from the CIA world Factbook.
 
 #### Population pyramid
 
@@ -356,9 +356,11 @@ if(!file.exists(here("data", "spatial", "village_sampling.rds"))) {
       
       geo_sample_list[[i]]$summary_geo <- summary_geo
       geo_sample_list[[i]]$sample_plot <- building_dens
+      geo_sample_list[[i]]$building_model <- viz_building_model
       
       
    }
+   
    
    write_rds(geo_sample_list, here("data", "spatial", "village_sampling.rds"))
    village_sampling <- geo_sample_list

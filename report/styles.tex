@@ -1,0 +1,10 @@
+\newcommand{\mydoublerule}{
+    \noindent\makebox[\linewidth]{\rule{\textwidth}{0.5pt}}
+    \noindent\makebox[\linewidth]{\rule{\textwidth}{0.5pt}}
+}
+\makeatletter
+\renewcommand\subsubsection{\@startsection{subsubsection}{3}{\z@}%
+                                     {-3.25ex\@plus -1ex \@minus -.2ex}%
+                                     {1.5ex \@plus .2ex}%
+                                     {\normalfont\large\bfseries\raggedright}}
+\makeatother
