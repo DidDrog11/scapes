@@ -1,3 +1,21 @@
+\usepackage{tcolorbox}
+\tcbuselibrary{breakable}
+\usepackage{xcolor}
+
+\definecolor{paleyellow}{RGB}{255,255,204}
+\definecolor{darkblue}{HTML}{00008B}
+
+\newtcolorbox{householdbox}{
+  colback=yellow!20,
+  colframe=yellow!50!black,
+  arc=0pt,
+  outer arc=0pt,
+  fonttitle=\bfseries,
+  coltitle=black,
+  breakable,  % Allow breaks across pages
+  after={\clearpage}
+}
+
 \newcommand{\mydoublerule}{
     \noindent\makebox[\linewidth]{\rule{\textwidth}{0.5pt}}
     \noindent\makebox[\linewidth]{\rule{\textwidth}{0.5pt}}
@@ -8,3 +26,9 @@
                                      {1.5ex \@plus .2ex}%
                                      {\normalfont\large\bfseries\raggedright}}
 \makeatother
+
+
+\usepackage{listings} % Include the listings package
+
+% Define the custom command for inline R expressions
+\newcommand{\inlineR}[1]{\mbox{\lstinline{#1}}}
