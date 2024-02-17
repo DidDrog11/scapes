@@ -22,7 +22,15 @@ check_unique_id_i <- function(df =  i_df_list$individual_main) {
     df$participant_id <- individual_id
     message(crayon::green("Individual IDs (combined household and participant ID) have overwritten participant IDs"))
   } else {
-    message(crayon::red("Individual IDs are not unique, needs correction prior to overwriting the participant ID"))
+    message(crayon::red("Individual IDs are not unique, needs correction prior to overwriting the participant ID. Duplicated individual IDs are returned."))
+    
+    duplicated_ids <- df %>%
+      select(household_id, participant_id, `_index`) %>%
+      mutate(individual_id = paste(household_id, participant_id, sep = "-")) %>%
+      filter(individual_id %in% individual_id[duplicated(individual_id)])
+    
+    return(duplicated_ids)
+    
   }
   
 }
@@ -33,6 +41,9 @@ check_unique_id_i(df =  i_df_list$individual_main)
 # Check individual questionnaire household IDs match hh questionnaire -----
 
 check_match <- function(df = i_df_list$individual_main) {
+  
+  no_h_questionnaires <- vector()
+  no_i_questionnaires <- vector()
   
   matched_hh <- tibble(in_i = as.character(df$household_id),
                        matched_hh = as.character(df$household_id) %in% as.character(hh_df_list$household_main$household_id))
@@ -54,7 +65,7 @@ check_match <- function(df = i_df_list$individual_main) {
             crayon::red("There is a mismatch between completed individual questionnaires and household level questionnaires based on their household ID\n"),
             crayon::red(paste("Household questionnaires from", matched_hh %>% filter(matched_hh == FALSE) %>% distinct(in_i) %>% nrow(), "household IDs (in the individual data) are missing\n")),
             crayon::red(paste("This has resulted in", matched_hh %>% filter(matched_hh == FALSE) %>% nrow(), "individual questionnaires being unable to be linked to household level data\n")),
-            crayon::red("The household IDs of those without household questionnaires are stored in `no_h_questionnaires`\n"))
+            crayon::red("The household IDs of those without household questionnaires are stored in `match_questionnaires$no_h_questionnaires`\n"))
   }
   
   no_h_questionnaires <- matched_hh %>%
@@ -81,7 +92,7 @@ check_match <- function(df = i_df_list$individual_main) {
                                                            mutate(village = str_sub(in_hh, end = 3)) %>%
                                                            group_by(village) %>%
                                                            summarise(n_households = n()))), collapse = "\n")),
-            crayon::red("\nThe household IDs of those without individual questionnaires are stored in `no_i_questionnaires`"))
+            crayon::red("\nThe household IDs of those without individual questionnaires are stored in `match_questionnaires$no_i_questionnaires`"))
     
     no_i_questionnaires <- matched_i %>%
       filter(is.na(n)) %>%
@@ -90,9 +101,12 @@ check_match <- function(df = i_df_list$individual_main) {
     
   }
   
+  return(list(no_h_questionnaires = no_h_questionnaires,
+              no_i_questionnaires = no_i_questionnaires))
+  
 }
 
-check_match(df = i_df_list$individual_main)
+match_questionnaires <- check_match(df = i_df_list$individual_main)
 
 
 # Checking completeness ---------------------------------------------------
@@ -151,9 +165,11 @@ dbs_id_check <- function(df = i_df_list$individual_main) {
                                "These mismatches have been stored in `dbs_mismatch`")))
   }
   
+  return(dbs_mismatch)
+  
 }
 
-dbs_id_check(df = i_df_list$individual_main)
+dbs_mismatch <- dbs_id_check(df = i_df_list$individual_main)
 
 # Then to check these have been logged in the inventory document
 
@@ -279,10 +295,13 @@ missing_rcs <- check_rcs(df = i_df_list$individual_main)
 
 # Identify missing data ---------------------------------------------------
 
-missing_data <- list(missing_age = missing_age,
+missing_data <- list(missing_h_questionnaire = match_questionnaires$no_h_questionnaires,
+                     missing_i_questionnaire = match_questionnaires$no_i_questionnaires,
+                     missing_age = missing_age,
                      missing_names = missing_names,
                      missing_sex = missing_sex,
                      missing_dbs_id = missing_dbs_id,
+                     duplicated_dbs_id = dbs_mismatch,
                      missing_dbs_image = missing_dbs_img,
                      missing_rcs_image = missing_rcs) %>%
   enframe(name = "missing") %>%
@@ -290,8 +309,10 @@ missing_data <- list(missing_age = missing_age,
   rename(id = value) %>%
   left_join(i_df_list$individual_main %>%
               select(id, interviewer_id, date) %>%
-              mutate(interviewer_id)) %>%
+              mutate(interviewer_id = as_factor(interviewer_id))) %>%
   arrange(id, interviewer_id, date, missing)
+
+write_csv(missing_data, here("data", "missing", paste0("missing_", Sys.Date(), ".csv")))
 
 # Save clean dataframe ----------------------------------------------------
 

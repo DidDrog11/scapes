@@ -1,0 +1,322 @@
+As data checks are added the functions and their purposes will be recorded here.
+
+Data checks are performed on the `hh_df_list` object which is read in `.rds` format after being produced in `main\01_rename_variables_hh.R`. All data checks and associated cleaning steps are performed in `main\02_clean_data_hh.R`
+
+#### Check 1: Unique numbering of households  
+
+
+**Description:** This check ensures that each household in the dataset has a unique identifier.  
+
+**Arguments:**  
+
+-   `df`: The dataframe containing household data. Default is hh_df_list$household_main.
+
+**Returns:**  
+
+-   `NULL` if all household IDs are unique.
+-   Dataframe containing duplicate records if duplicates are found.  
+
+**Code:**
+\footnotesize
+``` {r check-unique-id, tidy = TRUE, eval = FALSE}
+check_unique_id <- function(df = hh_df_list$household_main) {
+  duplicate_indices <- duplicated(df$household_id) | duplicated(df$household_id, fromLast = TRUE)
+  if (any(duplicate_indices)) {
+    duplicate_records <- df$`_index`[duplicate_indices, ]
+    message(crayon::red("FAIL: Duplicate household IDs found. Check duplicate_records for details."))
+    return(duplicate_records)
+  } else {
+    message(crayon::green("PASS: All household IDs are unique"))
+    return(NULL)
+  }
+}
+
+# Execute the function to check for unique household IDs
+duplicate_records <- check_unique_id(df = hh_df_list$household_main)
+```
+\normalsize
+**Outcomes:**  
+
+-   If the message "All household IDs are unique" is returned, this indicates that each household has a unique identifier in the data pulled down from the server.  
+-   The returned object is `NULL` if the check is passed.  
+-   If the message "Duplicate household IDs found. Check duplicate_records for details" is returned, the study team should be contacted to correct the underlying data. If it is not possible for them to do this directly in the form the necessary correction can be made on the data stored in the server. Finally, if that is not possible the correction can be made directly in these scripts directly into the `hh_df_list$household_main` object.  
+-   The returned object (`duplicate_records`) is a vector of values from the `hh_df_list$household_main$_index` column of the data. This can be used for further investigation of the duplication.  
+
+#### Check 2: Household coordinates  
+
+**Description:** The `clean_coordinates` function is designed to clean and validate geographic coordinates extracted from the questionnaire records. It checks for coordinates falling within specified boundaries (Nigeria and relevant Local Government Authorities), corrects errors such as misplaced decimal points, and logs any potential issues encountered during the process.
+
+**Arguments:**  
+
+-   `df`: The dataframe containing coordinates to be cleaned. The default is `hh_df_list$household_main`.  
+
+**Returns:**  
+
+-   An updated dataframe with corrected coordinates.  
+
+**Source code:**  
+\footnotesize
+``` {r clean-coordintes, tidy = TRUE, eval = FALSE}
+clean_coordinates <- function(df = hh_df_list$household_main) {
+  # Extract coordinates from the dataframe
+  coords <- extract_coordinates(df)
+  # Define administrative boundaries
+  Nigeria <- gadm(country = "NGA", level = 0, path = here("data", "spatial"))
+  lga <- gadm(country = "NGA", level = 2, path = here("data", "spatial"))
+  # Check coordinates against country boundary and administrative boundaries
+  checked_coords <- check_coordinates(coords, Nigeria, lga)
+  # Correct errors in the coordinates
+  # Factors to correct
+  factors <- 10^(0:12)
+  corrected_coords <- correct_errors(checked_coords, factors, Nigeria)
+  # Log messages about the coordinates
+  log_messages(coords, checked_coords, corrected_coords)
+  # Update the original dataframe with the corrected coordinates
+  updated_df <- update_coordinates(corrected_coords$coords_spat, df)
+  # Return the updated dataframe
+  return(updated_df)
+}
+```
+\normalsize
+##### Extract coordinates sub-function  
+<br>
+**Description:** The `extract_coordinates` sub-function extracts latitude and longitude coordinates from a dataframe.  
+
+**Arguments:**  
+
+-   `df`: A dataframe containing coordinates to be extracted.  
+
+**Returns:**  
+
+-   A SpatVector object containing extracted coordinates.  
+
+**Source code:**  
+\footnotesize
+``` {r extract-coordintes, tidy = TRUE, eval = FALSE}
+# Sub-function 1: Extract Coordinates
+extract_coordinates <- function(df) {
+  # Extract coordinates from the dataframe
+  coords <- df %>% 
+    dplyr::select(`_index`, id = household_id, latitude, longitude) %>%
+    # Remove rows with missing latitude or longitude values
+    dplyr::filter(!is.na(latitude) & !is.na(longitude)) %>%
+    # Create a SpatVector
+    vect(geom = c("longitude", "latitude"), crs = project_CRS)
+  return(coords)
+}
+```
+\normalsize
+##### Check coordinates sub-function  
+
+**Description:** The `check_coordinates` sub-function checks whether coordinates fall within specified boundaries.
+
+**Arguments:**  
+
+-   `coords`: A SpatVector object containing coordinates to be checked
+-   `Nigeria`: A spatial object representing the boundaries of Nigeria. Obtained using the `gadm` function of the `geodata` R package.
+-   `lga`: A spatial object representing the boundaries of Local Government Authorities within Nigeria (Level-2).  Obtained using the `gadm` function of the `geodata` R package.  
+
+**Returns:**  
+
+-   A list containing checked coordinates.  
+
+**Source code:**  
+\footnotesize
+``` {r check-coordintes, tidy = TRUE, eval = FALSE}
+# Sub-function 2: Check Coordinates
+check_coordinates <- function(coords, Nigeria, lga) {
+  coords_spat <- coords
+  in_nigeria <- coords_spat[Nigeria]
+  out_nigeria <- coords_spat[!is.related(coords_spat, Nigeria, "intersects"), ]
+  
+  # Add LGA information to the coordinates
+  coords_spat$lga <- coords_spat %>%
+    mutate(abbreviation = str_split(coords_spat$id, "-", simplify = TRUE)[, 1]) %>%
+    left_join(village_state %>%
+                select(abbreviation, lga)) %>%
+    pull(lga)
+  # Check if coordinates fall within the correct LGA
+  in_lga <- coords_spat[coords_spat$lga == terra::extract(lga, coords_spat)$NAME_2]
+  out_lga <- coords_spat[coords_spat$lga != terra::extract(lga, coords_spat)$NAME_2 | is.na(terra::extract(lga, coords_spat)$NAME_2)]
+  
+  list(coords_spat = coords_spat, in_nigeria = in_nigeria, out_nigeria = out_nigeria, in_lga = in_lga, out_lga = out_lga)
+}
+```
+\normalsize
+##### Correct errors sub-function  
+
+**Description:** The `correct_errors` sub-function corrects errors in coordinates, such as misplaced decimal points.  
+
+**Arguments:**  
+
+-   `coords`: A list containing checked coordinates.
+-   `factors`: A vector of factors used for correcting coordinates.
+-   `Nigeria`: A spatial object representing the boundary of Nigeria.
+
+**Returns:**  
+
+-   A list containing corrected coordinates.
+
+**Source code:**  
+\footnotesize
+``` {r correct-errors, tidy = TRUE, eval = FALSE}
+# Sub-function 3: Correct Errors
+correct_errors <- function(coords, factors, Nigeria) {
+  potential_errors <- data.frame()
+  updated_coords <- coords$coords_spat  # Store the updated coordinates in a new object
+  for (index in coords$out_nigeria$`_index`) {
+    record <- coords$coords[coords$coords$`_index` == index]
+    # Initialize a flag to track if any correction is made for this record
+    correction_made <- FALSE
+    # Check latitude value range and correct if high or low
+    if (crds(record)[,2] >= 14.0 || crds(record)[,2] <= 4.0) {
+      for (factor in factors) {
+        corrected_latitude <- crds(record)[,2] / factor
+        # Check if corrected latitude falls within the desired range
+        if (corrected_latitude >= 4.0 && corrected_latitude <= 14.0) {
+          # Create a new SpatVector with the updated latitude
+          updated_coords <- crds(coords$coords_spat)
+          updated_coords[coords$coords_spat$`_index` == index] <- c(crds(record)[,1], corrected_latitude)
+          updated_spatvector <- vect(updated_coords, crs = project_CRS) %>%
+            bind_spat_cols(coords$coords_spat)
+          # Replace the SpatVector in coords with the updated one
+          coords$coords_spat <- updated_spatvector
+          potential_errors <- bind_rows(potential_errors, tibble("_index" = index, reason = if (crds(record)[,2] >= 14.0)
+            "corrected decimal point mistake (latitude high)" else
+              "corrected decimal point mistake (latitude low)"))
+          correction_made <- TRUE
+          break
+        }
+      }
+    }
+    # Check longitude value range and correct if high or low
+    if (crds(record)[,1] >= 15.0 || crds(record)[,1] <= 2.0) {
+      for (factor in factors) {
+        corrected_longitude <- crds(record)[,1] / factor
+        # Check if corrected longitude falls within the desired range
+        if (corrected_longitude >= 2.0 && corrected_longitude <= 15.0) {
+          # Create a new SpatVector with the updated longitude
+          updated_coords <- crds(coords$coords_spat)
+          updated_coords[coords$coords_spat$`_index` == index] <- c(corrected_longitude, crds(record)[, 2])
+          updated_spatvector <- vect(updated_coords, crs = project_CRS) %>%
+            bind_spat_cols(coords$coords_spat)
+          # Replace the SpatVector in coords with the updated one
+          coords$coords_spat <- updated_spatvector
+          potential_errors <- bind_rows(potential_errors, tibble("_index" = index, reason = if (crds(record)[,1] >= 15.0)
+            "corrected decimal point mistake (longitude high)" else 
+              "corrected decimal point mistake (longitude low)"))
+          correction_made <- TRUE
+          break
+        }
+      }
+    }
+    # Check for swapped lat and long
+    if (!is.na(crds(record)[,2]) && !is.na(crds(record)[,1]) && 
+        crds(record)[,2] >= 4.0 && crds(record)[,2] <= 14.0 && 
+        crds(record)[,1] >= 2.0 && crds(record)[,1] <= 15.0) {
+      # Create a new SpatVector with swapped latitude and longitude
+      updated_coords <- tibble(x = crds(record)[, c("y")],
+                               y = crds(record)[, c("x")])
+      updated_spatvector <- vect(updated_coords, geom = c("x", "y"), crs = project_CRS) %>%
+        bind_spat_cols(record)
+      # Check if the swapped coordinates are within country bounds
+      if (is.related(updated_spatvector, Nigeria, "intersects")) {
+        coords$coords_spat <- bind_spat_rows(coords$coords[coords$coords$`_index` != index],
+                                        updated_spatvector)
+        potential_errors <- bind_rows(potential_errors, tibble("_index" = index, reason = "corrected latitude and longitude swap"))
+        correction_made <- TRUE
+      } else {
+        coords$coords_spat <- coords$coords_spat  # If not within bounds, revert to original coordinates
+      }
+    }
+    # If no correction is made for this record, consider it as an "other error"
+    if (!correction_made) {
+      potential_errors <- bind_rows(potential_errors, tibble("_index" = index, reason = "other potential error"))
+    }
+  }
+  # Extract the corrected coordinates and potential errors
+  corrected_coords <- list(
+    coords_spat = coords$coords_spat,
+    in_nigeria = coords$in_nigeria,
+    out_nigeria = coords$out_nigeria,
+    potential_errors = potential_errors
+  )
+  return(corrected_coords)
+}
+```
+\normalsize
+##### Update coordinates sub-function  
+
+**Description:** The `update_coordinates` sub-function updates the original dataframe with corrected coordinates.
+
+**Arguments:**  
+
+-   `coords`: A SpatVector object containing corrected coordinates.
+-   `df`: A dataframe containing original coordinates.
+
+**Returns:**  
+
+-   An updated dataframe with corrected coordinates.  
+
+**Source code:**  
+\footnotesize
+``` {r update-coordinates, tidy = TRUE, eval = FALSE}
+# Sub-function 4: Update Coordinates
+update_coordinates <- function(coords = coords_spat, df) {
+  # Match the row indices between the original dataframe and the corrected coordinates
+  rows_to_update <- match(coords$`_index`, df$`_index`)
+  # Extract the corrected latitude and longitude from the coords object
+  updated_latitude <- crds(coords)[, 2]  # Column number 2 corresponds to latitude
+  updated_longitude <- crds(coords)[, 1] # Column number 1 corresponds to longitude
+  # Update the relevant rows in the original dataframe with the corrected coordinates
+  df[rows_to_update, c("latitude", "longitude")] <- list(updated_latitude, updated_longitude)
+  # Return the updated dataframe
+  return(df)
+}
+```
+\normalsize
+##### Log messages sub-function  
+
+**Description:** The `log_messages` sub-function logs messages about the coordinate cleaning processes.  
+
+**Arguments:**  
+
+-   `coords`: A SpatVector object containing coordinates.
+-   `checked_coords`: A list containing checked coordinates.
+-   `corrected_coords`: A list containing corrected coordinates.
+
+**Source code:**  
+\footnotesize
+``` {r log-messages, tidy = TRUE, eval = FALSE}
+# Sub-function 5: Log Messages
+log_messages <- function(coords, checked_coords, corrected_coords) {
+  # Coordinate Check 1
+  cat("Coordinate Check 1:\n")
+  cat(crayon::green(paste(bold(nrow(checked_coords$in_nigeria)),
+                          "records have coordinates within Nigeria.\n")))
+  cat(crayon::yellow(paste(bold(nrow(coords) - nrow(checked_coords$in_nigeria)),
+                           "records have coordinates falling outside of Nigeria.\n")))
+  cat(crayon::red(paste(bold(nrow(df) - nrow(coords)),
+                        "records have missing coordinates.\n")))
+  # Summary
+  unique_errors <- nrow(corrected_coords$potential_errors)
+  cat(paste(unique_errors,
+            "unique record(s) had incorrect coordinates.\n"))
+  # Coordinate Check 2
+  cat("\nCoordinate Check 2:\n")
+  cat(crayon::red(paste(bold(nrow(checked_coords$out_lga)),
+                        "records have coordinates outside of the correct LGAs.\n")))
+  # Coordinate Check 3
+  cat("\nCoordinate Check 3:\n")
+  if (unique_errors == 0) {
+    cat(crayon::green("No latitude and longitude swapping detected.\n"))
+  } else {
+    cat(crayon::yellow("No latitude and longitude swapping detected after correction.\n"))
+  }
+  # Coordinate Check 4
+  cat("\nCoordinate Check 4:\n")
+  cat(crayon::yellow(paste(bold(nrow(corrected_coords$potential_errors)),
+                           "misplaced decimal points were detected and corrected.\n")))
+}
+```
+\normalsize

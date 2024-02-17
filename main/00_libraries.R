@@ -21,6 +21,7 @@ pkgs <- c("cowplot",
           "robotoolbox",
           "terra",
           "tidyverse",
+          "tidyterra",
           "viridisLite")
 
 pacman::p_load(pkgs, character.only = T)
@@ -30,7 +31,7 @@ utm_nigeria_CRS = "EPSG:26332"
 
 village_state = tibble(abbreviation = c("zug", "dye", "iky", "oki", "oga", "ofo", "eze", "eny", "off"),
                        village = c("Zugu", "Dyegh", "Ikyogbakpev", "Okimbongha", "Ogamanna", "Ofonekom", "Ezeakataka", "Enyandulogu", "Offianka"),
-                       lga = c("Vandeikya", "Vandeikya", "Vandeikya", "Obubura", "Obubura", "Obubura", "Izzi", "Izzi", "Izzi"),
+                       lga = c("Vande Ikya", "Vande Ikya", "Vande Ikya", "Obubra", "Obubra", "Obubra", "Izzi", "Izzi", "Izzi"),
                        state = c("Benue", "Benue", "Benue", "Cross River", "Cross River", "Cross River", "Ebonyi", "Ebonyi", "Ebonyi"))
 
 # Number of states and villages per state

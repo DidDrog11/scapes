@@ -1,0 +1,1824 @@
+#### Metadata and associated household.  
+
+The first section of the household questionnaire records the date, time and location of the completed questionnaire. The linkage to the household questionnaire is through this section.
+
+
+:::: {.individualbox data-latex=""}
+
+\footnotesize
+
+**Variable Name:** `start`  
+
+**Question:** Start  
+
+**Description:** This variable records the data and time the questionnaire was initialised.
+
+**Type of Data:** Datetime  
+
+--- 
+
+**Variable Name:** `calculate_date`  
+
+**Question:** Date  
+
+**Description:** This variable captures the date when the questionnaire is initiated.  
+
+**Type of Data:** Date %Y\_%m\_%d  
+
+--- 
+
+**Variable Name:** `deviceid`  
+
+**Question:** Device ID  
+
+**Description:** This variable captures the unique identifier of the device used to complete the questionnaire.  
+
+---
+
+**Variable Name:** `interviewer_id`  
+
+**Question:** Enter your interviewer ID  
+
+**Description:** This variable captures the ID of the interviewer conducting the survey.  
+
+**Type of Data:** Single-select  
+
+**Options for Responses:**    
+- Option 1: Diana (Code: 1)  
+- Option 2: Helen (Code: 2)  
+- Option 3: Nzube (Code: 3)  
+- Option 4: Sunday (Code: 4)  
+- Option 5: Other (Code: other)  
+
+--- 
+
+**Variable Name:** `interviewer_id_other`  
+
+**Question:** Specify other  
+
+**Description:** This variable captures additional details if 'Other' is selected in `interviewer_id`.  
+
+**Type of Data:** Free-text  
+
+--- 
+
+**Variable Name:** `community`  
+
+**Question:** Which community is the household located in?  
+
+**Description:** This variable captures the community where the surveyed household is located.  
+
+**Type of Data:** Single-select  
+
+**Options for Responses:**    
+- Option 1: Dyegh (Akwa Kwasi) (Code: dyegh)  
+- Option 2: Ikyogbakpev (Akwa kwasi) (Code: ikyogbakpev)  
+- Option 3: Zugu (Code: zugu)  
+- Option 4: Okimbongha (Code: okimbongha)  
+- Option 5: Ogamanna (Code: ogamanna)  
+- Option 6: Ofonekom (Code: ofonekom)  
+- Option 7: Ezeakataka (Code: ezeakataka)  
+- Option 8: Enyandulogu (Code: enyandulogu)  
+- Option 9: Offianka (Code: offianka)  
+
+--- 
+
+**Variable Name:** `household_number`  
+
+**Question:** What household number is this?  
+
+**Description:** This variable captures the household number. This is allocated by the team using the household enumaration from the village.  
+
+**Type of Data:** Integer  
+
+--- 
+
+**Variable Name:** `household_id`  
+
+**Question:** Household ID  
+
+**Description:** This variable concatenates the first three letters of the community name with the household number to generate a unique household ID. This is then presented to the interviewer for confirmation.  
+
+**Type of Data:** Calculated  
+
+:::
+
+#### Consent process  
+
+Consent is captured after initialising the questionnaire. We do this to aid understanding of sampling (i.e., how many selected households consented to enrollment). 
+
+:::: {.individualbox data-latex=""}
+
+\footnotesize
+
+**Variable Name:** `over_18`  
+
+**Question:** Is this participant over 18 years old?  
+
+**Description:** This variable captures whether the participant is over 18 years old.  
+
+**Type of Data:** Single-select  
+
+**Options for Responses:**    
+- Option 1: Yes (Code: yes)  
+- Option 2: No (Code: no)  
+
+--- 
+
+**Variable Name:** `informed_consent_adult`  
+
+**Question:** The participant has had the study processes explained to them and has provided written informed consent to take part in the study. They are made aware that they can remove themselves from the study at any point by contacting the study team.  
+
+**Description:** This variable captures whether the adult participant has provided informed consent to participate in the study after understanding the study processes.  
+
+**Type of Data:** Single-select  
+
+**Options for Responses:**    
+- Option 1: Yes (Code: yes)  
+- Option 2: No (Code: no)  
+
+**Note:** Thank the participant for their time, complete and save this form and move on to the next participant if the response is No. This question is asked if the participant is over 18 years old (`over_18` equals 'yes').  
+
+--- 
+
+**Variable Name:** `blood_sample_consent_adult`  
+
+**Question:** The participant has had the processes for obtaining a Dried Blood Spot explained to them and has provided written informed consent for this.  
+
+**Description:** This variable captures whether the adult participant has provided informed consent for obtaining a Dried Blood Spot (DBS) sample.  
+
+**Type of Data:** Single-select  
+
+**Options for Responses:**    
+- Option 1: Yes (Code: yes)  
+- Option 2: No (Code: no)  
+
+**Note:** Thank them for enrolling in the study and providing a blood sample, we will move onto the questions after recording the consent form. This question is asked if the participant is over 18 years old (`over_18` equals 'yes') and has provided informed consent to participate in the study (`informed_consent_adult` equals 'yes').  
+
+--- 
+
+**Variable Name:** `under_12`  
+
+**Question:** Is the child under 12?  
+
+**Description:** This variable captures whether the participant is under 12 years old.  
+
+**Type of Data:** Single-select  
+
+**Options for Responses:**    
+- Option 1: Yes (Code: yes)  
+- Option 2: No (Code: no)  
+
+**Note:** This question is asked if the participant is not over 18 years old (`over_18` equals 'no').  
+
+--- 
+
+**Variable Name:** `assent_under_18`  
+
+**Question:** The participant has had the study processes explained to them and have provided assent for enrollment in the study. Signed consent has been provided by their parent or guardian.  
+
+**Description:** This variable captures whether the participant, who is under 18 years old, has provided assent for enrollment in the study, with signed consent provided by their parent or guardian.  
+
+**Type of Data:** Single-select  
+
+**Options for Responses:**    
+- Option 1: Yes (Code: yes)  
+- Option 2: No (Code: no)  
+
+--- 
+
+**Variable Name:** `blood_sample_assent_child`  
+
+**Question:** The participant has had the processes for obtaining a Dried Blood Spot explained to them and has provided written informed consent for this.  
+
+**Description:** This variable captures whether the participant, who is under 18 years old, has provided written informed consent for obtaining a Dried Blood Spot (DBS) sample.  
+
+**Type of Data:** Single-select  
+
+**Options for Responses:**    
+- Option 1: Yes (Code: yes)  
+- Option 2: No (Code: no)  
+
+:::
+
+#### Individual demographics.  
+
+:::: {.individualbox data-latex=""}
+
+\footnotesize
+
+**Variable Name:** `first_name`  
+
+**Question:** First name  
+
+**Description:** This variable captures the first name that the individual uses. This information is important for contact purposes if needed.  
+
+**Type of Data:** Free-text  
+
+--- 
+
+**Variable Name:** `surname`  
+
+**Question:** Surname  
+
+**Description:** This variable captures the surname of the individual.  
+
+**Type of Data:** Free-text  
+
+--- 
+
+**Variable Name:** `age_individual`  
+
+**Question:** Age in years  
+
+**Description:** This variable captures the age of the individual in years.  
+
+**Type of Data:** Integer  
+
+--- 
+
+**Variable Name:** `yob_individual`  
+
+**Question:** Year of birth  
+
+**Description:** This variable calculates the year of birth based on the current year and the individual's age.  
+
+**Type of Data:** Calculated  
+
+--- 
+
+**Variable Name:** `sex_individual`  
+
+**Question:** Sex  
+
+**Description:** This variable captures the sex of the individual.  
+
+**Type of Data:** Single-select  
+
+**Options for Responses:**    
+- Option 1: Female (Code: female)  
+- Option 2: Male (Code: male)  
+
+--- 
+
+**Variable Name:** `ethnicity_individual`  
+
+**Question:** Ethnicity  
+
+**Description:** This variable captures the ethnicity of the individual.  
+
+**Type of Data:** Single-select  
+
+**Options for Responses:**    
+- Option 1: Igbo (Izzi) (Code: igbo_izzi)  
+- Option 2: Igbo (Other) (Code: igbo_other)  
+- Option 3: Membe (Code: membe)  
+- Option 4: Tiv (Code: tiv)  
+- Option 5: Other (Code: other)  
+
+---
+
+**Variable Name:** `ethnicity_individual_other`  
+
+**Question:** Specify ethnicity  
+
+**Description:** This variable captures the ethnicity of the individual if 'Other' is selected in the response to `ethnicity_individual`.  
+
+**Type of Data:** Free-text  
+
+--- 
+
+**Variable Name:** `religion_individual`  
+
+**Question:** Religion  
+
+**Description:** This variable captures the religion of the individual.  
+
+**Type of Data:** Single-select  
+
+**Options for Responses:**    
+- Option 1: Christian (Code: christian)  
+- Option 2: Muslim (Code: muslim)  
+- Option 3: Traditionalist (Code: traditionalist)  
+- Option 4: Other (Code: other)  
+
+--- 
+
+**Variable Name:** `religion_individual_other`  
+
+**Question:** Specify religion  
+
+**Description:** This variable captures the religion of the individual if 'Other' is selected in the response to `religion_individual`.  
+
+**Type of Data:** Free-text  
+
+--- 
+
+**Variable Name:** `education`  
+
+**Question:** Level of education  
+
+**Description:** This variable captures the level of education of the individual.  
+
+**Type of Data:** Single-select  
+
+**Options for Responses:**    
+- Option 1: None/No formal schooling (Code: none)  
+- Option 2: Primary education (up until age 12) (Code: primary)  
+- Option 3: Junior secondary education (up until age 16) (Code: junior_secondary)  
+- Option 4: Senior secondary education (up until age 19) (Code: senior_secondary)  
+- Option 5: University level education (Code: undergraduate)  
+- Option 6: Master's, Doctoral level degree (Code: postgraduate)  
+- Option 7: Other (Code: other)  
+
+--- 
+
+**Variable Name:** `education_other`  
+
+**Question:** Specify other  
+
+**Description:** This variable captures other levels of education if 'Other' is selected in the response to `education`.  
+
+**Type of Data:** Free-text  
+
+--- 
+
+**Variable Name:** `education_subject`  
+
+**Question:** What subject was studied in higher education?  
+
+**Description:** This variable captures the subject studied in higher education if the individual selected 'University level education' or 'Master's, Doctoral level degree' in the response to `education`.  
+
+**Type of Data:** Free-text  
+
+:::
+
+#### Place of birth and length of residence.  
+
+:::: {.individualbox data-latex=""}
+
+\footnotesize
+**Variable Name:** `community_pob`  
+
+**Question:** Is the community we are currently in your place of birth?  
+
+**Description:** This variable captures whether the community where the survey is being conducted is the participant's place of birth.  
+
+**Type of Data:** Single-select  
+
+**Options for Responses:**    
+- Option 1: Yes (Code: yes)  
+- Option 2: No (Code: no)  
+
+--- 
+
+**Variable Name:** `country_of_birth`  
+
+**Question:** What country were you born in?  
+
+**Description:** This variable captures the country where the participant was born. This question is asked if the participant's current community is not their place of birth.  
+
+**Type of Data:** Free-text  
+
+--- 
+
+**Variable Name:** `state_of_birth`  
+
+**Question:** What state were you born in?  
+
+**Description:** This variable captures the state where the participant was born. This question is asked if the participant's current community is not their place of birth.  
+
+**Type of Data:** Free-text  
+
+--- 
+
+**Variable Name:** `region_of_birth`  
+
+**Question:** What LGA were you born in?  
+
+**Description:** This variable captures the Local Government Area (LGA) where the participant was born. This question is asked if the participant's current community is not their place of birth.  
+
+**Type of Data:** Free-text  
+
+--- 
+
+**Variable Name:** `village_of_birth`  
+
+**Question:** What is the name of the village you were born in?  
+
+**Description:** This variable captures the name of the village where the participant was born. This question is asked if the participant's current community is not their place of birth.  
+
+**Type of Data:** Free-text  
+
+--- 
+
+**Variable Name:** `year_arrived`  
+
+**Question:** What year did you move to this community?  
+
+**Description:** This variable captures the year when the participant moved to the current community. This question is asked if the participant's current community is not their place of birth.  
+
+**Type of Data:** Integer  
+
+--- 
+
+**Variable Name:** `resident_months`  
+
+**Question:** How much of the year are you resident in this community (in months)?  
+
+**Description:** This variable captures the number of months the participant resides in the current community.  
+
+**Type of Data:** Integer  
+**Range:** 1 - 12 (Step of 1)
+
+--- 
+
+**Variable Name:** `resident_elsewhere`  
+
+**Question:** In the last 12 months what are the names of the places where you have spent more than two weeks sleeping?  
+
+**Description:** This variable captures the names of the places where the participant has spent more than two weeks sleeping in the last 12 months.  
+
+**Type of Data:** Free-text  
+
+--- 
+
+**Variable Name:** `non_resident_reason`  
+
+**Question:** Why are they resident in these places?  
+
+**Description:** This variable captures the reasons why the participant resides in the places mentioned in `resident_elsewhere`.  
+
+**Type of Data:** Free-text  
+
+--- 
+
+**Variable Name:** `return_reason`  
+
+**Question:** Why do they return to this community?  
+
+**Description:** This variable captures the reasons why the participant returns to the current community.  
+
+**Type of Data:** Free-text  
+
+--- 
+
+**Variable Name:** `sleep_elsewhere`  
+
+**Question:** Do you regularly sleep in a different location?  
+
+**Description:** This variable captures whether the participant regularly sleeps in a different location.  
+
+**Type of Data:** Single-select  
+
+**Options for Responses:**    
+- Option 1: Yes (Code: yes)  
+- Option 2: No (Code: no)  
+
+--- 
+
+**Variable Name:** `sleep_elsewhere_location`  
+
+**Question:** Where are these locations you regularly sleep?  
+
+**Description:** This variable captures the locations where the participant regularly sleeps if they answered 'Yes' to `sleep_elsewhere`.  
+
+**Type of Data:** Free-text  
+
+:::
+
+#### Marital status and children.
+
+
+:::: {.individualbox data-latex=""}
+
+\footnotesize
+
+**Variable Name:** `relationship`  
+
+**Question:** What is your marital status?  
+
+**Description:** This variable captures the marital status of the participant.  
+
+**Type of Data:** Single-select  
+
+**Options for Responses:**    
+- Option 1: Single (Code: single)  
+- Option 2: Married (Code: married)  
+- Option 3: Divorced (Code: divorced)  
+- Option 4: Widowed (Code: widowed)  
+- Option 5: Cohabiting (Code: cohabiting)  
+- Option 6: Separated (Code: separated)  
+
+--- 
+
+**Variable Name:** `children_ever`  
+
+**Question:** Do you have or have you ever had children?  
+
+**Description:** This variable captures whether the participant has or has ever had children.  
+
+**Type of Data:** Single-select  
+
+**Options for Responses:**    
+- Option 1: Yes (Code: yes)  
+- Option 2: No (Code: no)  
+
+--- 
+
+**Variable Name:** `n_children`  
+
+**Question:** How many children have you had?  
+
+**Description:** This variable captures the total number of children the participant has had.  
+
+**Type of Data:** Integer  
+
+**Note:** This question is asked if the participant has or has ever had children.  
+
+--- 
+
+**Variable Name:** `children_alive`  
+
+**Question:** How many children are alive?  
+
+**Description:** This variable captures the number of children who are currently alive.  
+
+**Type of Data:** Integer  
+
+**Note:** This question is asked if the participant has or has ever had children.  
+
+--- 
+
+**Variable Name:** `children_in_household`  
+
+**Question:** How many children live at home currently? (more than 6 months a year)  
+
+**Description:** This variable captures the number of children who live at home currently, residing for more than 6 months a year.  
+
+**Type of Data:** Integer  
+
+**Note:** This question is asked if there is at least one child alive (`children_alive` >= 1).  
+:::
+
+
+#### Occupation and individual income.
+
+:::: {.individualbox data-latex=""}
+
+\footnotesize
+
+**Variable Name:** `work`  
+
+**Question:** What kind of work do you do to make money and to get food?  
+
+**Description:** This variable captures the type of work the participant engages in to earn money and obtain food.  
+
+**Type of Data:** Multiple-select  
+
+**Options for Responses:**    
+- Option 1: Farming (Code: farming)  
+- Option 2: Assist with agricultural work (in household fields) (Code: ag_worker)  
+- Option 3: Assist with agricultural work (in other households' fields) (Code: ag_worker_elsewhere)  
+- Option 4: Hunter/Trapper (Code: hunter_trapper)  
+- Option 5: Fishing (Code: fishing)  
+- Option 6: Timber (Code: timber)  
+- Option 7: Collect forest goods (NTFPs) (Code: ntfps)  
+- Option 8: Animal husbandry (Code: animal)  
+- Option 9: Trader (Code: trader)  
+- Option 10: Artisan/Handiwork/Carpenter (Code: artisan)  
+- Option 11: Driver (Code: driver)  
+- Option 12: Teacher (Code: teacher)  
+- Option 13: Clergy (minister, pastor) (Code: clergy)  
+- Option 14: Student (Code: student)  
+- Option 15: Government worker (Code: government_worker)  
+- Option 16: Pensioner (Code: pensioner)  
+- Option 17: Other (Code: other)  
+
+--- 
+
+**Variable Name:** `income_other`  
+
+**Question:** Specify other  
+
+**Description:** This variable captures additional types of work if 'Other' is selected in `work`.  
+
+**Type of Data:** Free-text  
+
+--- 
+
+**Variable Name:** `income_individual`  
+
+**Question:** In a normal month, how much money do you personally bring into the household?  
+
+**Description:** This variable captures the estimated monthly income brought into the household by the participant.  
+
+**Type of Data:** Integer  
+
+--- 
+
+**Variable Name:** `field_entry`  
+
+**Question:** Do you ever go into the agricultural fields or farms?  
+
+**Description:** This variable captures whether the participant ever goes into agricultural fields or farms.  
+
+**Type of Data:** Single-select  
+
+**Options for Responses:**    
+- Option 1: Yes (Code: yes)  
+- Option 2: No (Code: no)  
+
+--- 
+
+**Variable Name:** `field_work_freq`  
+
+**Question:** In the last 12 months, how many months did you spend working in fields/farm?  
+
+**Description:** This variable captures the frequency of the participant's work in fields or farms over the past 12 months.  
+
+**Type of Data:** Integer  
+**Range:** 1 - 12 (Step of 1)
+
+**Note:** This question is asked if the participant answers 'Yes' to `field_entry`.  
+
+--- 
+
+**Variable Name:** `field_work_seasonality`  
+
+**Question:** Which seasons do you work in the fields/farm?  
+
+**Description:** This variable captures the seasons in which the participant works in fields or farms.  
+
+**Type of Data:** Single-select  
+
+**Options for Responses:**    
+- Option 1: Dry (Code: dry)  
+- Option 2: Rainy (Code: rainy)  
+- Option 3: All seasons (Code: all_seasons)  
+
+**Note:** This question is asked if the participant does not work in fields or farms for all 12 months (`field_work_freq` != '12').  
+
+--- 
+
+**Variable Name:** `forest_entry`  
+
+**Question:** Do you ever go into forested areas?  
+
+**Description:** This variable captures whether the participant ever goes into forested areas.  
+
+**Type of Data:** Single-select  
+
+**Options for Responses:**    
+- Option 1: Yes (Code: yes)  
+- Option 2: No (Code: no)  
+
+--- 
+
+**Variable Name:** `forest_entry_purpose`  
+
+**Question:** Why do you go into the forest?  
+
+**Description:** This variable captures the purposes for which the participant goes into the forest.  
+
+**Type of Data:** Multiple-select  
+
+**Options for Responses:**    
+- Option 1: Hunting/Trapping (Code: hunting_trapping)  
+- Option 2: Collecting food (Code: collecting_food)  
+- Option 3: NTFPs (Code: ntfps)  
+- Option 4: Gathering firewood (Code: firewood)  
+- Option 5: Transiting through on my way elsewhere (Code: transit)  
+- Option 6: For cultural or religious activity (Code: cultural)  
+- Option 7: For leisure purposes (Code: leisure)  
+- Option 8: Other (Code: other)  
+
+**Note:** This question is asked if the participant answers 'Yes' to `forest_entry`.  
+
+--- 
+
+**Variable Name:** `forest_entry_purpose_other`  
+
+**Question:** Specify other  
+
+**Description:** This variable captures additional purposes for going into the forest if 'Other' is selected in `forest_entry_purpose`.  
+
+**Type of Data:** Free-text  
+
+**Note:** This question is asked if 'Other' is selected in `forest_entry_purpose`.  
+
+--- 
+
+**Variable Name:** `forest_entry_freq`  
+
+**Question:** In the last 12 months, how many months did you spend accessing the forest?  
+
+**Description:** This variable captures the frequency of the participant's access to the forest over the past 12 months.  
+
+**Type of Data:** Integer  
+**Range:** 1 - 12 (Step of 1)
+
+**Note:** This question is asked if the participant answers 'Yes' to `forest_entry`.  
+
+--- 
+
+**Variable Name:** `forest_work_seasonality`  
+
+**Question:** Which seasons do you access the forest?  
+
+**Description:** This variable captures the seasons in which the participant accesses the forest.  
+
+**Type of Data:** Single-select  
+
+**Options for Responses:**    
+- Option 1: Dry (Code: dry)  
+- Option 2: Rainy (Code: rainy)  
+- Option 3: All seasons (Code: all_seasons)  
+
+**Note:** This question is asked if the participant does not access the forest for all 12 months (`forest_entry_freq` != '12') and answers 'Yes' to `forest_entry`.  
+
+:::
+
+#### Meat consumption, type and frequency
+
+:::: {.individualbox data-latex=""}
+
+\footnotesize
+
+**Variable Name:** `meat_consumption`
+
+**Question:** Do you eat meat from domestic animals?
+
+**Description:** This variable captures whether the participant consumes meat from domestic animals.
+
+**Type of Data:** Single-select (Yes/No)
+
+**Options for Responses:**    
+- Option 1: Yes (Code: yes)  
+- Option 2: No (Code: no)  
+
+---
+
+**Variable Name:** `meat_consumption_type`
+
+**Question:** What types of domestic meat do you eat?
+
+**Description:** This variable captures the types of domestic meat consumed by the participant. This question is asked if the participant responds 'Yes' to `meat_consumption`.
+
+**Type of Data:** Multiple-select
+
+**Options for Responses:**    
+- Option 1: Chicken (Code: chicken)  
+- Option 2: Goat/Sheep (Code: goat)  
+- Option 3: Cow (Code: cow)  
+- Option 4: Pig (Code: pig)  
+- Option 5: Turkey (Code: turkey)  
+- Option 6: Other (Code: other)  
+
+---
+
+**Variable Name:** `meat_consumption_freq`
+
+**Question:** How often do you eat domestic meat?
+
+**Description:** This variable captures the frequency of consuming domestic meat. This question is asked if the participant responds 'Yes' to `meat_consumption`.
+
+**Type of Data:** Single-select
+
+**Options for Responses:**    
+- Option 1: A few times in my life (Code: few_life)  
+- Option 2: A few times in a year (Code: few_year)  
+- Option 3: A few times in a month (Code: few_month)  
+- Option 4: A few times in a week (Code: few_week)  
+- Option 5: Every day (Code: daily)  
+
+---
+
+**Variable Name:** `bushmeat_consumption`
+
+**Question:** Do you eat meat from bush animals?
+
+**Description:** This variable captures whether the participant consumes meat from bush animals.
+
+**Type of Data:** Single-select (Yes/No)
+
+**Options for Responses:**    
+- Option 1: Yes (Code: yes)  
+- Option 2: No (Code: no)  
+
+---
+
+**Variable Name:** `bushmeat_animals`
+
+**Question:** Which bushmeat have you eaten in the last 12 months?
+
+**Description:** This variable captures the types of bushmeat consumed by the participant. This question is asked if the participant responds 'Yes' to `bushmeat_animals`.
+
+**Type of Data:** Multiple-select
+
+**Options for Responses:**    
+- Option 1: Rabbit  
+- Option 2: Giant pouched rat  
+- Option 3: Grasscutter  
+- Option 4: Monkey  
+- Option 5: Porcupine (Chuku chuku)  
+- Option 6: Squirrel  
+- Option 7: Other rats  
+- Option 8: Deer (Duiker/Antelope/Bush goat)  
+- Option 9: Snake  
+- Option 10: Birds  
+- Option 11: Shrew  
+- Option 12: None  
+- Option 13: Other  
+
+---
+
+**Variable Name:** `bushmeat_freq`
+
+**Question:** How often do you eat meat from animals in the bush?
+
+**Description:** This variable captures the frequency of consuming bushmeat. This question is asked if the participant responds 'Yes' to `bushmeat_animals`.
+
+**Type of Data:** Single-select
+
+**Options for Responses:**    
+- Option 1: A few times in my life (Code: few_life)  
+- Option 2: A few times in a year (Code: few_year)  
+- Option 3: A few times in a month (Code: few_month)  
+- Option 4: A few times in a week (Code: few_week)  
+- Option 5: Every day (Code: daily)  
+
+---
+
+**Variable Name:** `meat_avoided`
+
+**Question:** Are there any animals you do not eat?
+
+**Description:** This variable captures whether the participant avoids eating certain animals.
+
+**Type of Data:** Single-select (Yes/No)
+
+**Options for Responses:**    
+- Option 1: Yes (Code: yes)  
+- Option 2: No (Code: no)  
+
+---
+
+**Variable Name:** `meat_avoided_animals`
+
+**Question:** What animals will you not eat?
+
+**Description:** This variable captures the specific animals that the participant avoids eating. This question is asked if the participant responds 'Yes' to avoiding certain animals.
+
+**Type of Data:** Free-text
+
+:::
+
+#### Rodent consumption and handling.
+
+:::: {.individualbox data-latex=""}
+\footnotesize
+
+**Variable Name:** `current_rodent_consumption`
+
+**Question:** Do they currently eat rat?
+
+**Description:** This variable captures whether the participant currently consumes rat as part of their diet.
+
+**Type of Data:** Single-select (Yes/No)
+
+**Options for Responses:**    
+- Option 1: Yes (Code: yes)  
+- Option 2: No (Code: no)  
+
+---
+
+**Variable Name:** `past_rodent_consumption`
+
+**Question:** Have they ever eaten rat?
+
+**Description:** This variable captures whether the participant has ever consumed rat in the past.
+
+**Type of Data:** Single-select (Yes/No)
+
+**Options for Responses:**    
+- Option 1: Yes (Code: yes)  
+- Option 2: No (Code: no)  
+
+---
+
+**Variable Name:** `rodent_consumption`
+
+**Question:** Why do you eat rats?
+
+**Description:** This variable captures the reasons why the participant eats rats. This question is asked if the participant currently eats rats or has eaten rats in the past.
+
+**Type of Data:** Multiple-select
+
+**Options for Responses:**    
+- Option 1: They taste good (Code: taste)  
+- Option 2: They are important for my nutrition (Code: nutrition)  
+- Option 3: I am hungry (Code: hunger)  
+- Option 4: They are available (Code: availability)  
+- Option 5: They are cheap compared to other meat (Code: cheap)  
+- Option 6: It is part of my culture (Code: cultural)  
+- Option 7: Other reason (Code: other)  
+
+---
+
+**Variable Name:** `rodent_eat_other`
+
+**Question:** Specify other
+
+**Description:** This variable captures additional reasons for eating rats if 'Other' is selected in `rodent_consumption`.
+
+**Type of Data:** Free-text
+
+---
+
+**Variable Name:** `rodent_consumption_hunger`
+
+**Question:** If you didn't eat rats would you go hungry?
+
+**Description:** This variable captures whether the participant would go hungry if they didn't eat rats. This question is asked if "Yes" is selected in `rodent_consumption`.
+
+**Type of Data:** Single-select (Yes/No)
+
+**Options for Responses:**    
+- Option 1: Yes (Code: yes)  
+- Option 2: No (Code: no)  
+
+---
+
+**Variable Name:** `sell_rodent`
+
+**Question:** Have you ever sold rats?
+
+**Description:** This variable captures whether the participant has ever sold rats.
+
+**Type of Data:** Single-select (Yes/No)
+
+**Options for Responses:**    
+- Option 1: Yes (Code: yes)  
+- Option 2: No (Code: no)  
+
+---
+
+**Variable Name:** `sell_rodent_location`
+
+**Question:** Where do you sell rats?
+
+**Description:** This variable captures the locations where the participant sells rats. This question is asked if "Yes" is selected in `sell_rodent`.
+
+**Type of Data:** Multiple-select
+
+**Options for Responses:**    
+- Option 1: Within the community (Code: community)  
+- Option 2: In markets outside of the community (Code: outside_community)  
+- Option 3: In cities (Code: cities)  
+- Option 4: Other locations (Code: other)  
+
+---
+
+**Variable Name:** `sell_rodent_importance`
+
+**Question:** What contribution to your income is the money you make from selling rats?
+
+**Description:** This variable captures the importance of the income derived from selling rats to the participant's overall income.
+
+**Type of Data:** Single-select (Small/Medium/Large)
+
+**Options for Responses:**    
+- Option 1: Small (Code: small)  
+- Option 2: Medium (Code: medium)  
+- Option 3: Large (Code: large)  
+
+---
+
+**Variable Name:** `sell_rodent_condition`
+
+**Question:** What is the condition of rats you sell?
+
+**Description:** This variable captures the condition of the rats sold by the participant. This question is asked if "Yes" is selected in `sell_rodent`.
+
+**Type of Data:** Multiple-select
+
+**Options for Responses:**    
+- Option 1: Alive (Code: alive)  
+- Option 2: Raw (whole animal) (Code: raw_whole_animal)  
+- Option 3: Raw (butchered animal) (Code: raw_butchered_animal)  
+- Option 4: Dried (Code: dried)  
+- Option 5: Cooked (whole animal) (Code: cooked_whole)  
+- Option 6: Cooked (butchered animal) (Code: cooked_butchered)  
+- Option 7: Other (Code: other)  
+
+---
+
+**Variable Name:** `sell_mastomys`
+
+**Question:** Do you ever sell *Mastomys natalensis* (the multimammate rat)?
+
+**Description:** This variable captures whether the participant ever sells *Mastomys natalensis*.
+
+**Type of Data:** Single-select (Yes/No)
+
+**Options for Responses:**    
+- Option 1: Yes (Code: yes)  
+- Option 2: No (Code: no)  
+
+---
+
+**Variable Name:** `sell_mastomys_condition`
+
+**Question:** What is the condition of *Mastomys natalensis* you sell?
+
+**Description:** This variable captures the condition of the *Mastomys natalensis* sold by the participant. This question is asked if "Yes" is selected in `sell_mastomys`.
+
+**Type of Data:** Multiple-select
+
+**Options for Responses:**    
+- Option 1: Alive (Code: alive)  
+- Option 2: Raw (whole animal) (Code: raw_whole_animal)  
+- Option 3: Raw (butchered animal) (Code: raw_butchered_animal)  
+- Option 4: Dried (Code: dried)  
+- Option 5: Cooked (whole animal) (Code: cooked_whole)  
+- Option 6: Cooked (butchered animal) (Code: cooked_butchered)  
+- Option 7: Other (Code: other)  
+
+:::
+
+#### Administered rodent products for health or cultural practices.
+
+Repeat question group, this is only completed if the individual has been involved in administering rodent products for healthcare or cultural practices.
+
+:::: {.individualbox data-latex=""}
+
+\mydoublerule{}
+
+\centering
+\Large 
+\textcolor{blue!80!black}{\textbf{Repeat Section: Administering rodent products for health or cultural practices}}
+\color{black}
+\raggedright
+\footnotesize  
+
+---
+
+**Variable Name:** `name_health_cultural`
+
+**Question:** What is the name of the practice?
+
+**Description:** This variable captures the name of the cultural health practice involving the use of rats.
+
+**Type of Data:** Free-text
+
+---
+
+**Variable Name:** `rodent_species`
+
+**Question:** What rat species is this information about?
+
+**Description:** This variable captures the specific rat species relevant to the cultural health practice.
+
+**Type of Data:** Multiple-select
+
+**Options for Responses:**    
+- Option 1: Ntaali (Code: ntaali)  
+- Option 2: Ektupo (Code: ektupo)  
+- Option 3: Nkapfu (Code: nkapfu)  
+- Option 4: Oginyi (Code: oginyi)  
+- Option 5: Ikpo (Code: ikpo)  
+- Option 6: Okoror (Code: okoror)  
+- Option 7: Oriku (Code: oriku)  
+- Option 8: Odupfu (Code: odupfu)  
+- Option 9: Ekwata (Code: ekwata)  
+- Option 10: Kpev (Code: kpev)  
+- Option 11: Agundu (Code: agundu)  
+- Option 12: Julie (Code: julie)  
+- Option 13: Akpezinga/Abrazinga (Code: akpezinga)  
+- Option 14: Mbam/Ngbam (Code: mbam)  
+- Option 15: Nyongu (Code: nyongu)  
+- Option 16: Sam (Code: sam)  
+- Option 17: Agbacha (Code: agbacha)  
+- Option 18: Torhe (Code: torhe)  
+- Option 19: Fashion (Code: fashion)  
+- Option 20: Ubina (Code: ubina)  
+- Option 21: Irom (Code: irom)  
+- Option 22: Imanava (Code: imanava)  
+
+---
+
+**Variable Name:** `part_of_rodent`
+
+**Question:** What parts of the rat were used for this practice?
+
+**Description:** This variable captures the parts of the rat utilized in the cultural health practice.
+
+**Type of Data:** Multiple-select
+
+**Options for Responses:**    
+- Option 1: Meat of rat (Code: meat)  
+- Option 2: Skin of rat (Code: skin)  
+- Option 3: Bones/teeth/claws of rat (Code: hard_part)  
+- Option 4: Whole rat (Code: whole_animal)  
+- Option 5: Organs of the rat (Code: internal_organs)  
+- Option 6: Faeces of the rat (Code: faeces)  
+- Option 7: Fat of the rat (Code: fat)  
+- Option 8: Fur of the rat (Code: fur)  
+- Option 9: Rat blood (Code: blood)  
+- Option 10: Other (Code: other)  
+
+---
+
+**Variable Name:** `purpose_of_rodent`
+
+**Question:** What was the purpose of using this part?
+
+**Description:** This variable captures the purpose behind using the specified part of the rat in the cultural health practice.
+
+**Type of Data:** Free-text
+
+---
+
+**Variable Name:** `prepare_rodent`
+
+**Question:** How was the rat prepared?
+
+**Description:** This variable captures the method used to prepare the rat for the cultural health practice.
+
+**Type of Data:** Multiple-select
+
+**Options for Responses:**    
+- Option 1: Live (Code: live)  
+- Option 2: Raw (Code: raw)  
+- Option 3: Passive heat (under sun) (Code: passive_heat)  
+- Option 4: Direct heat (above fire) (Code: direct_heat)  
+- Option 5: Liquor (Code: liquor)  
+- Option 6: Other (Code: other)  
+- Option 7: Don't know (Code: unknown)  
+
+---
+
+**Variable Name:** `administering_rodent`
+
+**Question:** How was the rat prescribed/administered?
+
+**Description:** This variable captures how the rat was prescribed or administered in the cultural health practice.
+
+**Type of Data:** Multiple-select
+
+**Options for Responses:**    
+- Option 1: Oral (Code: oral)  
+- Option 2: Topical (skin) (Code: topical_skin)  
+- Option 3: Topical (eye) (Code: topical_eye)  
+- Option 4: Topical (inhaled) (Code: topical_inhaled)  
+- Option 5: Enema (Code: enema)  
+- Option 6: Subcutaneous (Code: subcutaneous)  
+- Option 7: Intravenous (Code: intravenous)  
+- Option 8: Other (Code: other)  
+- Option 9: Don't know (Code: unknown)  
+
+\centering
+\normalsize 
+\textcolor{blue!80!black}{\textbf{End of administering rodent products repeat}}
+\color{black}
+\raggedright
+\mydoublerule{}  
+
+:::
+
+#### Prepared rodent products for health or cultural practices.
+
+Repeat question group. Only completed if the individual has reported being involved in the preparation of rodent products for healthcare or cultural practices.
+
+:::: {.individualbox data-latex=""}
+
+\mydoublerule{}
+
+\centering
+\Large 
+\textcolor{blue!80!black}{\textbf{Repeat Section: Preparing rodent products for health or cultural practices}}
+\color{black}
+\raggedright
+\footnotesize  
+
+**Variable Name:** `prepared_health_cultural`
+
+**Question:** Have you ever prepared a rat for use in a cultural or health practice?
+
+**Description:** This variable captures whether the respondent has ever prepared a rat for use in a cultural or health practice.
+
+**Type of Data:** Single-select (Yes/No)
+
+**Options for Responses:**    
+- Option 1: Yes (Code: yes)  
+- Option 2: No (Code: no)  
+
+---
+
+**Variable Name:** `name_health_cultural_prep`
+
+**Question:** What is the name of the practice?
+
+**Description:** This variable captures the name of the cultural or health practice involving the prepared rat.
+
+**Type of Data:** Free-text
+
+---
+
+**Variable Name:** `rodent_species_prep`
+
+**Question:** What rat species is this information about?
+
+**Description:** This variable captures the specific rat species relevant to the cultural or health practice.
+
+**Type of Data:** Multiple-select
+
+**Options for Responses:**    
+- Option 1: Ntaali (Code: ntaali)  
+- Option 2: Ektupo (Code: ektupo)  
+- Option 3: Nkapfu (Code: nkapfu)  
+- Option 4: Oginyi (Code: oginyi)  
+- Option 5: Ikpo (Code: ikpo)  
+- Option 6: Okoror (Code: okoror)  
+- Option 7: Oriku (Code: oriku)  
+- Option 8: Odupfu (Code: odupfu)  
+- Option 9: Ekwata (Code: ekwata)  
+- Option 10: Kpev (Code: kpev)  
+- Option 11: Agundu (Code: agundu)  
+- Option 12: Julie (Code: julie)  
+- Option 13: Akpezinga/Abrazinga (Code: akpezinga)  
+- Option 14: Mbam/Ngbam (Code: mbam)  
+- Option 15: Nyongu (Code: nyongu)  
+- Option 16: Sam (Code: sam)  
+- Option 17: Agbacha (Code: agbacha)  
+- Option 18: Torhe (Code: torhe)  
+- Option 19: Fashion (Code: fashion)  
+- Option 20: Ubina (Code: ubina)  
+- Option 21: Irom (Code: irom)  
+- Option 22: Imanava (Code: imanava)  
+
+---
+
+**Variable Name:** `part_of_rodent_prep`
+
+**Question:** What parts of the rat were used for this practice?
+
+**Description:** This variable captures the parts of the rat utilized in the cultural or health practice.
+
+**Type of Data:** Multiple-select
+
+**Options for Responses:**    
+- Option 1: Meat of rat (Code: meat)  
+- Option 2: Skin of rat (Code: skin)  
+- Option 3: Bones/teeth/claws of rat (Code: hard_part)  
+- Option 4: Whole rat (Code: whole_animal)  
+- Option 5: Organs of the rat (Code: internal_organs)  
+- Option 6: Faeces of the rat (Code: faeces)  
+- Option 7: Fat of the rat (Code: fat)  
+- Option 8: Fur of the rat (Code: fur)  
+- Option 9: Don't know (Code: unknown)  
+- Option 10: Other (Code: other)  
+
+---
+
+**Variable Name:** `purpose_of_rodent_prep`
+
+**Question:** What was the purpose of using this part?
+
+**Description:** This variable captures the purpose behind using the specified part of the rat in the cultural or health practice.
+
+**Type of Data:** Free-text
+
+---
+
+**Variable Name:** `prepare_rodent_prep`
+
+**Question:** How was the rat prepared?
+
+**Description:** This variable captures the method used to prepare the rat for the cultural or health practice.
+
+**Type of Data:** Multiple-select
+
+**Options for Responses:**    
+- Option 1: Live (Code: live)  
+- Option 2: Raw (Code: raw)  
+- Option 3: Passive heat (under sun) (Code: passive_heat)  
+- Option 4: Direct heat (above fire) (Code: direct_heat)  
+- Option 5: Liquor (Code: liquor)  
+- Option 6: Other (Code: other)  
+
+---
+
+**Variable Name:** `administering_rodent_prep`
+
+**Question:** How was the rat prescribed/administered?
+
+**Description:** This variable captures how the rat was prescribed or administered in the cultural or health practice.
+
+**Type of Data:** Multiple-select
+
+**Options for Responses:**    
+- Option 1: Oral (Code: oral)  
+- Option 2: Topical (skin) (Code: topical_skin)  
+- Option 3: Topical (eye) (Code: topical_eye)  
+- Option 4: Topical (inhaled) (Code: topical_inhaled)  
+- Option 5: Enema (Code: enema)  
+- Option 6: Subcutaneous (Code: subcutaneous)  
+- Option 7: Intravenous (Code: intravenous)  
+- Option 8: Other (Code: other)  
+
+
+\centering
+\normalsize 
+\textcolor{blue!80!black}{\textbf{End of preparing rodent products repeat}}
+\color{black}
+\raggedright
+\mydoublerule{}  
+
+:::
+
+#### Rodent Contact Sheet.
+
+The rodent contact sheet is a paper administered survey where interviewees report their known and recalled contacts with rodents in the last year. Data is transcribed into a separate google sheets document but for record retention photographs are uploaded alongside the individuals questionnaire.
+
+:::: {.individualbox data-latex=""}
+\footnotesize
+
+**Image:** `rc_year_p1`
+
+**Description:** Take a photo of the first page of the participant's last year rodent contact sheet.
+
+**Additional Instructions:** Ensure the image is clear and readable. Maximum image size: 1024 pixels.
+
+---
+
+**Image:** `rc_year_p2`
+
+**Description:** Take a photo of the second page of the participant's last year rodent contact sheet.
+
+**Additional Instructions:** Ensure the image is clear and readable. Maximum image size: 1024 pixels.
+
+---
+
+**Image:** `rc_year_p3`
+
+**Description:** Take a photo of the third page of the participant's last year rodent contact sheet.
+
+**Additional Instructions:** Ensure the image is clear and readable. Maximum image size: 1024 pixels.
+
+---
+
+**Image:** `rc_year_p4`
+
+**Description:** Take a photo of the fourth page of the participant's last year rodent contact sheet.
+
+**Additional Instructions:** Ensure the image is clear and readable. Maximum image size: 1024 pixels.
+
+---
+
+**Variable Name:** `excreta_year`
+
+**Question:** In the last year have you come into contact with the urine or faeces of a rat?
+
+**Description:** This variable captures whether the respondent has come into contact with the urine or faeces of a rat in the last year.
+
+**Type of Data:** Single-select
+
+**Options for Responses:**    
+- Option 1: Yes (Code: yes)  
+- Option 2: No (Code: no)  
+- Option 3: Don't know (Code: unknown)  
+
+---
+
+**Variable Name:** `excreta_location`
+
+**Question:** Was this contact in the agricultural areas, somewhere you sleep, or somewhere else?
+
+**Description:** This variable captures the locations where the contact with rat urine or faeces occurred.
+
+**Type of Data:** Multiple-select
+
+**Options for Responses:**    
+- Option 1: Agricultural area (Code: fields)  
+- Option 2: Household (Code: house)  
+- Option 3: Yam barn (Code: barn)  
+- Option 4: Other (Code: other)  
+
+---
+
+**Variable Name:** `excreta_location_other`
+
+**Question:** Specify other
+
+**Description:** This variable allows the respondent to specify other locations where the contact with rat urine or faeces occurred.
+
+**Type of Data:** Free-text
+
+---
+
+**Variable Name:** `excreta_cleaning`
+
+**Question:** Do you ever clean up or remove the rat faeces when you see it?
+
+**Description:** This variable captures whether the respondent cleans up or removes rat faeces when they see it.
+
+**Type of Data:** Single-select
+
+**Options for Responses:**    
+- Option 1: Yes (Code: yes)  
+- Option 2: No (Code: no)  
+- Option 3: Don't know (Code: unknown)  
+
+---
+
+**Variable Name:** `excreta_cleaning_method`
+
+**Question:** How do you do this?
+
+**Description:** This variable captures the methods used by the respondent to clean up or remove rat faeces.
+
+**Type of Data:** Multiple-select
+
+**Options for Responses:**    
+- Option 1: Brush it out of the house (Code: brush)  
+- Option 2: Remove it with my hands (Code: hand)  
+- Option 3: Use water to wash it away (Code: water)  
+- Option 4: Other (Code: other)  
+
+---
+
+**Variable Name:** `excreta_cleaning_other`
+
+**Question:** Specify other
+
+**Description:** This variable allows the respondent to specify other methods used to clean up or remove rat faeces.
+
+**Type of Data:** Free-text
+
+:::
+
+#### Awareness of rodent associated diseases.
+
+:::: {.individualbox data-latex=""}
+\footnotesize
+
+**Variable Name:** `rodent_diseases`
+
+**Question:** Are you aware that people can get diseases or sicknesses spread to people by rats?
+
+**Description:** This variable captures whether the respondent is aware that people can get diseases or sicknesses spread to people by rats. If the respondent answers "Yes" to this question, they will be prompted to specify the names of these diseases.
+
+**Type of Data:** Single-select
+
+**Options for Responses:**    
+- Option 1: Yes (Code: yes)  
+- Option 2: No (Code: no)  
+
+---
+
+**Variable Name:** `rodent_diseases_name`
+
+**Question:** What are the names of these diseases?
+
+**Description:** This variable captures the names of diseases spread to people by rats, if the respondent is aware of any. If the respondent selects "Lassa fever" as one of the diseases, they will be prompted to provide more information about their knowledge of Lassa fever.
+
+**Type of Data:** Multiple-select
+
+**Options for Responses:**    
+- Option 1: Malaria (Code: malaria)  
+- Option 2: Typhoid (Code: typhoid)  
+- Option 3: Ebola (Code: ebola)  
+- Option 4: Lassa fever (Code: lassa)  
+- Option 5: Mpox/Monkeypox (Code: mpox)  
+- Option 6: Leptospirosis (Code: leptospirosis)  
+- Option 7: Leishmaniasis (Code: leishmaniasis)  
+- Option 8: Scrub typhus/Spotted fever/Rickettsial disease (Code: rickettsial)  
+- Option 9: Stomach problems (Code: stomach_symptoms)  
+- Option 10: Don't know (Code: unknown)  
+- Option 11: Other (Code: other)  
+
+---
+
+**Variable Name:** `rodent_diseases_other`
+
+**Question:** Specify other
+
+**Description:** This variable allows the respondent to specify other diseases spread to people by rats.
+
+**Type of Data:** Free-text
+
+---
+
+**Variable Name:** `lassa_disease_aware`
+
+**Question:** Have you heard about a disease called Lassa fever?
+
+**Description:** This variable captures whether the respondent has heard about a disease called Lassa fever. If the respondent answers "Yes" to this question or selects "Lassa fever" in the previous question, they will be prompted to provide more information about their knowledge of Lassa fever.
+
+**Type of Data:** Single-select
+
+**Options for Responses:**    
+- Option 1: Yes (Code: yes)  
+- Option 2: No (Code: no)  
+
+---
+
+**Variable Name:** `lassa_source`
+
+**Question:** Where have you heard about Lassa fever?
+
+**Description:** This variable captures the sources from which the respondent has heard about Lassa fever.
+
+**Type of Data:** Multiple-select
+
+**Options for Responses:**    
+- Option 1: Television (Code: television)  
+- Option 2: Radio (Code: radio)  
+- Option 3: Social media (Code: social_media)  
+- Option 4: Pamphlets/Posters (Code: pamphlets_posters)  
+- Option 5: Newspapers (Code: newspapers)  
+- Option 6: Hospital or health centre (Code: hospital_or_health_centre)  
+- Option 7: Place of worship (Code: place_of_worship)  
+- Option 8: Government sources (Code: government_sources)  
+- Option 9: School/University (Code: school_university)  
+- Option 10: Word of mouth (Code: word_of_mouth)  
+- Option 11: Other (Code: other)  
+
+---
+
+**Variable Name:** `lassa_source_other`
+
+**Question:** Specify other
+
+**Description:** This variable allows the respondent to specify other sources from which they have heard about Lassa fever.
+
+**Type of Data:** Free-text
+
+---
+
+**Variable Name:** `lassa_infection_source`
+
+**Question:** How can humans get infected with Lassa fever?
+
+**Description:** This variable captures how humans can get infected with Lassa fever.
+
+**Type of Data:** Multiple-select
+
+**Options for Responses:**    
+- Option 1: Don't know (Code: dont_know)  
+- Option 2: Contact with rats (Code: contact_rats)  
+- Option 3: Contact with people (Code: contact_people)  
+- Option 4: Dirty environments (Code: dirty_environments)  
+- Option 5: Witchcraft (Code: witchcraft)  
+- Option 6: Weather (Code: weather)  
+- Option 7: Other (Code: other)  
+
+---
+
+**Variable Name:** `human_lassa_infection_other`
+
+**Question:** Specify other
+
+**Description:** This variable allows the respondent to specify other ways humans can get infected with Lassa fever.
+
+**Type of Data:** Free-text
+
+---
+
+**Variable Name:** `rodent_contact_lassa`
+
+**Question:** What type of contact with rats can spread Lassa fever?
+
+**Description:** This variable captures the types of contact with rats that can spread Lassa fever.
+
+**Type of Data:** Multiple-select
+
+**Options for Responses:**    
+- Option 1: Eating rats (Code: consumption_rat)  
+- Option 2: Being scratched/bitten by rats (Code: rat_wound)  
+- Option 3: Touching rats (direct contact) (Code: touch_rat)  
+- Option 4: Contact with their faeces or urine (indirect contact) (Code: contact_excreta)  
+- Option 5: Other (Code: other)  
+
+---
+
+**Variable Name:** `rodent_contact_lassa_other`
+
+**Question:** Specify other
+
+**Description:** This variable allows the respondent to specify other types of contact with rats that can spread Lassa fever.
+
+**Type of Data:** Free-text
+
+---
+
+**Variable Name:** `rodent_species_lassa`
+
+**Question:** Which type of rats can spread Lassa fever?
+
+**Description:** This variable captures which type of rats can spread Lassa fever.
+
+**Type of Data:** Free-text
+
+---
+
+**Variable Name:** `rodent_species_lassa_explicit`
+
+**Question:** Do any of these rats spread Lassa fever?
+
+**Description:** This variable captures whether any of the specified rat species spread Lassa fever.
+
+**Type of Data:** Multiple-select
+
+**Options for Responses:**    
+- Option 1: Yes (Code: yes)  
+- Option 2: No (Code: no)  
+
+---
+
+**Variable Name:** `lassa_diseases_other`
+
+**Question:** Specify other
+
+**Description:** This variable allows the respondent to specify other diseases spread to people by rats.
+
+**Type of Data:** Free-text
+
+
+:::
+
+#### Under-12 demographics.  
+
+These questions are only asked of individuals under the age of 12 who will only be providing a DBS. 
+
+:::: {.individualbox data-latex=""}
+\footnotesize
+
+**Variable Name:** `child_first_name`
+
+**Question:** What is the first name of this child?
+
+**Type of Data:** Free-text
+
+---
+
+**Variable Name:** `child_surname`
+
+**Question:** What is the surname of this child?
+
+**Type of Data:** Free-text
+
+---
+
+**Variable Name:** `child_under_1`
+
+**Question:** Is this child younger than 1 year old?
+
+**Description:** This variable captures whether the child is younger than 1 year old. If `child_under_1` is 'yes', the age of the child will be captured in months using the variable `age_in_months`. If `child_under_1` is 'no', the age will be captured in years using the variable `age_under_12`.
+
+**Type of Data:** Single-select
+
+**Options for Responses:**    
+- Option 1: Yes (Code: yes)  
+- Option 2: No (Code: no)  
+
+---
+
+**Variable Name:** `age_under_12`
+
+**Question:** Age in years
+
+**Description:** This variable captures the age of the child in years if they are older than 1 year old. Only asked when `child_under_1` is 'no'.  
+
+**Type of Data:** Integer
+
+---
+
+**Variable Name:** `age_in_months`
+
+**Question:** How old is this child in months?
+
+**Description:** This variable captures the age of the child in months if they are younger than 1 year old. Only asked when `child_under_1` is 'yes'.  
+
+**Type of Data:** Integer
+
+---
+
+**Variable Name:** `sex_under_12`
+
+**Question:** Sex  
+
+**Description:** This variable captures the sex of the child.  
+
+**Type of Data:** Single-select  
+
+**Options for Responses:**    
+- Option 1: Female (Code: female)  
+- Option 2: Male (Code: male)  
+
+---
+
+**Variable Name:** `community_pob_under_12`
+
+**Question:** Is the community we are currently in your place of birth?  
+
+**Description:** This variable captures whether the community the child is currently in is their place of birth.  
+
+**Type of Data:** Single-select  
+
+**Options for Responses:**    
+- Option 1: Yes (Code: yes)  
+- Option 2: No (Code: np)  
+
+---
+
+**Variable Name:** `country_of_birth_under_12`
+
+**Question:** What country were you born in?
+
+**Description:** This variable captures the country of birth of the child if the current community is not their place of birth. Asked when `community_pob_under_12` is 'no'.
+
+**Type of Data:** Free-text
+
+---
+
+**Variable Name:** `state_of_birth_under_12`
+
+**Question:** What state were you born in?
+
+**Description:** This variable captures the state of birth of the child if the current community is not their place of birth. Asked when `community_pob_under_12` is 'no'.  
+
+**Type of Data:** Free-text
+
+---
+
+**Variable Name:** `region_of_birth_under_12`
+
+**Question:** What LGA were you born in?
+
+**Description:** This variable captures the LGA of birth of the child if the current community is not their place of birth. Asked when `community_pob_under_12` is 'no'.  
+
+**Type of Data:** Free-text
+
+---
+
+**Variable Name:** `village_of_birth_under_12`
+
+**Question:** What is the name of the village you were born in?
+
+**Description:** This variable captures the village of birth of the child if the current community is not their place of birth. Asked when `community_pob_under_12` is 'no'.  
+
+**Type of Data:** Free-text
+
+---
+
+**Variable Name:** `year_arrived`
+
+**Question:** What year did you move to this community?
+
+**Description:** This variable captures the year the child moved to the current community if it's different from their place of birth.
+
+**Type of Data:** Integer
+
+
+:::
+
+#### Consent and DBS photographs.  
+
+:::: {.individualbox data-latex=""}
+\footnotesize
+**Variable Name:** `consent_p1`
+
+**Question:** Take a photo of the signature page of the consent form.
+
+**Description:** This image is a photograph of the signature page of the consent form signed by the participant or their legal guardian, indicating their consent to participate in the study.
+
+**Conditions:** This image is required for all participants as part of the consent process.
+
+**Maximum Image Size:** 640 pixels
+
+---
+
+**Variable Name:** `blood_spot`
+
+**Question:** Take a photo of the blood spot card, with its label attached that will be used for this participant.
+
+**Description:** This image is a photograph of the blood spot card with its label attached. The blood spot card will be used for collecting blood samples from the participant. This image is required if the participant has consented to provide a blood sample.
+
+**Conditions:** This image is required if the participant has consented to provide a blood sample. It is triggered when the participant indicates their consent for blood sample collection.
+
+**Maximum Image Size:** 640 pixels
+
+---
+
+**Variable Name:** `confirm_blood_spot`
+
+**Question:** Type the label of the blood spot card here.
+
+**Description:** This text field is used to input the label of the blood spot card attached to the blood sample collected from the participant. This is used for confirmation and matching individuals to their sample. It is required when the participant consents to provide a blood sample.
+
+**Conditions:** This field is required if the participant has consented to provide a blood sample. It is triggered when the participant indicates their consent for blood sample collection.
+
+:::

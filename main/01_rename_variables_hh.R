@@ -1,8 +1,8 @@
 
 # Import questionnaire ----------------------------------------------------
-drive_download("https://docs.google.com/spreadsheets/d/1YVVEsuOYtSrbmsW-Z30TvXHQWtTWgKre/edit?usp=sharing&ouid=109198876678825407497&rtpof=true&sd=true",
-               path = here("questionnaire", "hh_questionnaire_current.xlsx"),
-               overwrite = TRUE)
+# drive_download("https://docs.google.com/spreadsheets/d/1YVVEsuOYtSrbmsW-Z30TvXHQWtTWgKre/edit?usp=sharing&ouid=109198876678825407497&rtpof=true&sd=true",
+#                path = here("questionnaire", "hh_questionnaire_current.xlsx"),
+#                overwrite = TRUE)
 
 h_questions <- read_xlsx(path = here("questionnaire", "hh_questionnaire_current.xlsx"))
 
@@ -117,7 +117,7 @@ photo_rename <- tibble(original = c(names(h_dm_images_inside), names(h_dm_images
                        new = c(c("_index", "image_id", "image_filename", "image_description"),
                                c("_index", "image_id", "image_filename", "image_description")))
 
-h_df_images <-bind_rows(h_dm_images_outside %>%
+h_df_images <- bind_rows(h_dm_images_outside %>%
                           rename_with(~ photo_rename$new[match(., photo_rename$original)], everything()) %>%
                           mutate(image_id = paste0(image_id, "_out"),
                                  setting = "Outside"),

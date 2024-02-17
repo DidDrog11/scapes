@@ -50,3 +50,9 @@ rsconnect/
 
 # Ignore data folder
 data/
+
+# Ignore questionnaire folder
+questionnaire/
+
+# Ignore additional scripts folder
+additional/
