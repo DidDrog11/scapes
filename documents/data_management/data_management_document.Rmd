@@ -45,7 +45,7 @@ library(dm)
 library(dplyr)  
 library(readr)  
 
-dm <- read_rds(here("data", "h_data", "h_data_dm_2024-02-05.rds"))  
+dm <- read_rds(here("household_questionnaire", "data", "h_data", "h_data_dm_2024-02-05.rds"))  
 
 knitr::kable(tibble(`Table names` = names(dm),  
                     `Number of records` = sapply(dm, function(x) nrow(x)),  

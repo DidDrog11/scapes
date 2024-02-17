@@ -48,8 +48,9 @@ po/*~
 # RStudio Connect folder
 rsconnect/
 
-# Ignore data folder
-data/
+# Ignore data folders
+*data/
+project_data/
 
 # Ignore questionnaire folder
 questionnaire/
