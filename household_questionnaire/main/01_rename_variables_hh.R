@@ -4,14 +4,14 @@
 #                path = here("questionnaire", "hh_questionnaire_current.xlsx"),
 #                overwrite = TRUE)
 
-h_questions <- read_xlsx(path = here("questionnaire", "hh_questionnaire_current.xlsx"))
+h_questions <- read_xlsx(path = here("household_questionnaire", "questionnaire", "hh_questionnaire_current.xlsx"))
 
 # Load in H df -----------------------------------------------------------
 
-h_data_files <- list.files(here("data", "h_data"))[str_detect(list.files(here("data", "h_data")), "data_dm")] %>%
+h_data_files <- list.files(here("household_questionnaire", "data", "h_data"))[str_detect(list.files(here("household_questionnaire", "data", "h_data")), "data_dm")] %>%
   sort(decreasing = TRUE)
 
-h_dm <- read_rds(here("data", "h_data", h_data_files[1]))
+h_dm <- read_rds(here("household_questionnaire", "data", "h_data", h_data_files[1]))
 
 h_df_main <- h_dm$main %>%
   select(start, date, interviewer_id, `_index`, household_id, multiple_family_household, n_people, compound, n_in_other_households,
@@ -136,4 +136,4 @@ hh_df <- list(household_main = h_df_main,
               household_culture = h_df_culture,
               household_images = h_df_images)
 
-write_rds(hh_df, here("data", "h_data", "hh_df_list.rds"))
+write_rds(hh_df, here("household_questionnaire", "data", "h_data", "hh_df_list.rds"))

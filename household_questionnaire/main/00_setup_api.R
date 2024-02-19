@@ -19,7 +19,7 @@ SCAPES_hh_dm <- kobo_data(SCAPES_hh_submissions)
 
 dm_draw(SCAPES_hh_dm)
 
-write_rds(SCAPES_hh_dm, file = here("data", "h_data", paste0("h_data_dm_", Sys.Date(), ".rds")))
+write_rds(SCAPES_hh_dm, file = here("household_questionnaire", "data", "h_data", paste0("h_data_dm_", Sys.Date(), ".rds")))
 
 SCAPES_i_id <- kobo_library %>%
   filter(name == "SCAPES - Individual") %>%
@@ -31,5 +31,5 @@ SCAPES_i_dm <- kobo_data(SCAPES_i_submissions)
 
 dm_draw(SCAPES_i_dm)
 
-write_rds(SCAPES_i_dm, file = here("data", "i_data", paste0("i_data_dm_", Sys.Date(), ".rds")))
+write_rds(SCAPES_i_dm, file = here("household_questionnaire", "data", "i_data", paste0("i_data_dm_", Sys.Date(), ".rds")))
 

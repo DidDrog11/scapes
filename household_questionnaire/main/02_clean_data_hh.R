@@ -1,4 +1,4 @@
-hh_df_list <- read_rds(here("data", "h_data", "hh_df_list.rds"))
+hh_df_list <- read_rds(here("household_questionnaire", "data", "h_data", "hh_df_list.rds"))
 
 
 # Check unique numbering of households ------------------------------------
@@ -201,8 +201,8 @@ clean_coordinates <- function(df = hh_df_list$household_main) {
   # Extract coordinates from the dataframe
   coords <- extract_coordinates(df)
   # Define administrative boundaries
-  Nigeria <- gadm(country = "NGA", level = 0, path = here("data", "spatial"))
-  lga <- gadm(country = "NGA", level = 2, path = here("data", "spatial"))
+  Nigeria <- gadm(country = "NGA", level = 0, path = here("project_wide_data", "spatial"))
+  lga <- gadm(country = "NGA", level = 2, path = here("project_wide_data", "spatial"))
   # Check coordinates against country boundary and administrative boundaries
   checked_coords <- check_coordinates(coords, Nigeria, lga)
   # Correct errors in the coordinates
@@ -227,5 +227,5 @@ coords <- clean_coordinates(df = hh_df_list$household_main)
 
 # Save clean dataframe ----------------------------------------------------
 
-write_rds(hh_df_list, here("data", "h_data", "hh_df_list_cleaned.rds"))
+write_rds(hh_df_list, here("household_questionnaire", "data", "h_data", "hh_df_list_cleaned.rds"))
 

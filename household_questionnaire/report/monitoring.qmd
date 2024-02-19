@@ -44,10 +44,10 @@ knitr::opts_chunk$set(message = FALSE)
 project_CRS = "EPSG:4326"
 utm_nigeria_CRS = "EPSG:26332"
 
-village_state <- read_rds(here("data", "additional", "village_state.rds"))
-hh_df <- read_rds(here("data", "h_data", "hh_df_list_cleaned.rds"))
+village_state <- read_rds(here("project_wide_data", "village_state.rds"))
+hh_df <- read_rds(here("household_questionnaire", "data", "h_data", "hh_df_list_cleaned.rds"))
 hh_df$household_demographics <- zap_label(hh_df$household_demographics)
-village_colours <- read_rds(here("data", "additional", "village_colours.rds"))
+village_colours <- read_rds(here("project_wide_data", "village_colours.rds"))
 
 ```
 
@@ -152,7 +152,7 @@ hh_sizes %>%
    geom_bar(aes(x = n, fill = village)) +
    scale_fill_manual(values = village_colours) +
    facet_wrap(~ village, scales = "free_x") +
-   theme_minimal() +
+   theme_bw() +
    labs(x = "Number of individuals in household",
         y = "Count",
         fill = element_blank())
@@ -208,18 +208,18 @@ population_pyramid <- ggplot() +
 #| out-width: "30%"
 
 plot(population_pyramid)
-knitr::include_graphics("files/NI_popgraph2023.jpeg")
+knitr::include_graphics("NI_popgraph2023.jpg")
 
 ```
 
 ### Geographic
 
 ```{r geo-data}
-if(!file.exists(here("data", "spatial", "village_sampling.rds"))) {
+if(!file.exists(here("project_wide_data", "spatial", "village_sampling.rds"))) {
    library(sf)
    set.seed(42)
    
-   villages <- read_csv(here("data", "spatial", "scapes_spatial.csv")) %>%
+   villages <- read_csv(here("project_wide_data", "spatial", "scapes_spatial.csv")) %>%
       filter(location %in% village_state$village) %>%
       vect(geom = c("longitude", "latitude"), crs = project_CRS)
    
@@ -234,7 +234,7 @@ if(!file.exists(here("data", "spatial", "village_sampling.rds"))) {
    
    # abk_open_buildings was obtained from https://sites.research.google/open-buildings/ and subset to the study region elsewhere
    # Can be replicated by downloading and using the NGA shapefile to crop the dataset to make it more manageable
-   buildings <- read_rds(here("data", "spatial", "abk_open_buildings", "abk_open_buildings_crop.rds")) %>%
+   buildings <- read_rds(here("project_wide_data", "spatial", "abk_open_buildings", "abk_open_buildings_crop.rds")) %>%
       vect() %>%
       project(y = project_CRS)
    
@@ -362,12 +362,12 @@ if(!file.exists(here("data", "spatial", "village_sampling.rds"))) {
    }
    
    
-   write_rds(geo_sample_list, here("data", "spatial", "village_sampling.rds"))
+   write_rds(geo_sample_list, here("project_wide_data", "spatial", "village_sampling.rds"))
    village_sampling <- geo_sample_list
    
 } else {
    
-   village_sampling <- read_rds(here("data", "spatial", "village_sampling.rds"))
+   village_sampling <- read_rds(here("project_wide_data", "spatial", "village_sampling.rds"))
    
 }
 
@@ -506,7 +506,7 @@ Occupation as a measure of representativeness will be assessed comparing the ind
 DHS sample: N = 1,634 (Female = 1,278; Male = 356), median age = 28 (Female = 27, Male = 32).
 
 ```{r dhs-occupation-benue}
-nigeria_dhs <- read_rds(here("data", "additional", "nigeria_dhs.rds"))
+nigeria_dhs <- read_rds(here("miscellaneous", "data", "nigeria_dhs.rds"))
 
 generate_occupation_plot <- function(state_name) {
    

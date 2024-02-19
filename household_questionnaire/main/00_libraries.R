@@ -60,10 +60,10 @@ village_state <- tibble(village_state,
                         village_colour = colour_table$village_colour,
                         state_colour = colour_table$state_colour)
 
-write_rds(village_state, here("data", "additional", "village_state.rds"))
+write_rds(village_state, here("project_wide_data", "village_state.rds"))
 
 village_colours <- setNames(village_state$village_colour, village_state$village)
-write_rds(village_colours, here("data", "additional", "village_colours.rds"))
+write_rds(village_colours, here("project_wide_data", "village_colours.rds"))
 
 occupation_matching <- data.frame(
   "Individual questionnaire" = c("Farming", "Assist with agricultural work (in household fields)", "Assist with agricultural work (in other households fields)", 
