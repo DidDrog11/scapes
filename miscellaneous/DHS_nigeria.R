@@ -1,7 +1,7 @@
 #dhs_household <- read_sav(here("data", "additional", "NGHR7BFL.SAV"))
 #dhs_household_member <- read_sav(here("data", "additional", "NGPR7BFL.SAV"))
-dhs_individual <- read_sav(here("data", "additional", "NGIR7BFL.SAV"))
-dhs_mens <- read_sav(here("data", "additional", "NGMR7AFL.SAV"))
+dhs_individual <- read_sav(here("miscellaneous", "data", "NGIR7BFL.SAV"))
+dhs_mens <- read_sav(here("miscellaneous", "data", "NGMR7AFL.SAV"))
 
 #variable_names <- tibble(id = names(dhs_household),
 #                         name = labelled::get_variable_labels(dhs_household, unlist = TRUE))
@@ -45,22 +45,24 @@ nigeria_dhs <- bind_rows(
                                  TRUE ~ factor("No", levels = c("Yes", "No")))) %>%
   select(id, sex, age, state, education, occupation, setting, sampled_pop)
 
-dhs_occupation_match <- tibble(occupation = unique(nigeria_dhs$occupation),
-                               isco = c("Street and Related Sales and Service Workers",
-                                        NA,
-                                        "Professionals",
-                                        "Agriculture",
-                                        "Craft and Related Trades Workers",
-                                        "Elementary Occupations",
-                                        "Business and Administration Associate Professionals",
-                                        "Not working",
-                                        "Business and Administration Associate Professionals",
-                                        NA,
-                                        NA,
-                                        "Not working",
-                                        "Agriculture"))                    
+dhs_occupation_match <- tibble(occupation = unique(nigeria_dhs$occupation)) %>%
+  mutate(isco.manual = c("Street and Related Sales and Service Workers",
+                         NA,
+                         "Professionals",
+                         "Agriculture",
+                         "Craft and Related Trades Workers",
+                         "Elementary Occupations",
+                         "Business and Administration Associate Professionals",
+                         "Not working",
+                         "Business and Administration Associate Professionals",
+                         NA,
+                         NA,
+                         "Not working",
+                         "Agriculture"))
 
 nigeria_dhs <- nigeria_dhs %>%
-  left_join(dhs_occupation_match, by = "occupation")
+  left_join(dhs_occupation_match %>%
+              select(occupation, isco.manual), 
+            by = "occupation")
 
 write_rds(nigeria_dhs, here("data", "additional", "nigeria_dhs.rds"))         

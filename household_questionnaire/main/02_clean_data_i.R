@@ -1,4 +1,4 @@
-i_df_list <- read_rds(here("data", "i_data", "i_df_list.rds"))
+i_df_list <- read_rds(here("household_questionnaire", "data", "i_data", "i_df_list.rds"))
 
 # Remove those missing a participant ID
 excluded <- i_df_list$individual_main %>%
@@ -8,31 +8,34 @@ i_df_list$individual_main <- i_df_list$individual_main %>%
   filter(!is.na(participant_id))
 
 # Load cleaned hh questionnaire for comparisons
-hh_df_list <- read_rds(here("data", "h_data", "hh_df_list_cleaned.rds"))
+hh_df_list <- read_rds(here("household_questionnaire", "data", "h_data", "hh_df_list_cleaned.rds"))
 
 
 # Check unique numbering of individuals ------------------------------------
 
-check_unique_id_i <- function(df =  i_df_list$individual_main) {
+check_unique_id_i <- function(df = i_df_list$individual_main) {
   
+  # Combine household ID and participant ID to create individual ID
   individual_id <- paste(df$household_id, df$participant_id, sep = "-")
   
-  if(nrow(df) == length(unique(individual_id))) {
+  if (nrow(df) == length(unique(individual_id))) {
+    # If all individual IDs are unique, overwrite participant ID with individual ID
     message(crayon::green("All individual IDs are unique"))
     df$participant_id <- individual_id
     message(crayon::green("Individual IDs (combined household and participant ID) have overwritten participant IDs"))
   } else {
+    # If duplicate individual IDs are found, return duplicated IDs for correction
     message(crayon::red("Individual IDs are not unique, needs correction prior to overwriting the participant ID. Duplicated individual IDs are returned."))
     
     duplicated_ids <- df %>%
       select(household_id, participant_id, `_index`) %>%
+      # Create individual ID by combining household ID and participant ID
       mutate(individual_id = paste(household_id, participant_id, sep = "-")) %>%
+      # Filter duplicated individual IDs
       filter(individual_id %in% individual_id[duplicated(individual_id)])
     
     return(duplicated_ids)
-    
   }
-  
 }
 
 check_unique_id_i(df =  i_df_list$individual_main)
@@ -40,52 +43,65 @@ check_unique_id_i(df =  i_df_list$individual_main)
 
 # Check individual questionnaire household IDs match hh questionnaire -----
 
+# Check individual questionnaire household IDs match household questionnaire IDs
 check_match <- function(df = i_df_list$individual_main) {
   
-  no_h_questionnaires <- vector()
-  no_i_questionnaires <- vector()
+  no_h_questionnaires <- vector()  # Initialize vector to store missing household IDs in individual questionnaire data
+  no_i_questionnaires <- vector()  # Initialize vector to store missing household IDs in household questionnaire data
   
+  # Check if individual questionnaire household IDs match household questionnaire IDs
   matched_hh <- tibble(in_i = as.character(df$household_id),
-                       matched_hh = as.character(df$household_id) %in% as.character(hh_df_list$household_main$household_id))
+                       matched_hh = as.character(df$household_id) %in% 
+                         as.character(hh_df_list$household_main$household_id))
   matched_i <-  tibble(in_hh = as.character(hh_df_list$household_main$household_id),
-                       matched_i = as.character(hh_df_list$household_main$household_id) %in% as.character(df$household_id)) %>%
+                       matched_i = as.character(hh_df_list$household_main$household_id) %in% 
+                         as.character(df$household_id)) %>%
+    # Left join to count the number of individuals per household
     left_join(df %>%
                 group_by(household_id) %>%
                 summarise(n = n()),
               by = c("in_hh" = "household_id"))
   
+  # Check if all individual questionnaires come from sampled households
   if(all(matched_hh$matched_hh) == TRUE) {
-    
-    message(crayon::green("Check 1: PASS Individual questionnaires come from sampled households\n\n"),
+    message(crayon::green("Check 2a: PASS Individual questionnaires come from sampled households\n\n"),
             crayon::green("All completed individual questionnaires have completed household level questionnaires based on their household ID\n"))
-    
   } else {
-    
-    message(crayon::red("Check 1: FAIL Individual questionnaires come from unsampled households\n\n"),
+    # Display message for individual questionnaires from unsampled households
+    message(crayon::red("Check 2a: FAIL Individual questionnaires come from unsampled households\n\n"),
             crayon::red("There is a mismatch between completed individual questionnaires and household level questionnaires based on their household ID\n"),
-            crayon::red(paste("Household questionnaires from", matched_hh %>% filter(matched_hh == FALSE) %>% distinct(in_i) %>% nrow(), "household IDs (in the individual data) are missing\n")),
-            crayon::red(paste("This has resulted in", matched_hh %>% filter(matched_hh == FALSE) %>% nrow(), "individual questionnaires being unable to be linked to household level data\n")),
+            crayon::red(paste("Household questionnaires from", 
+                              matched_hh %>% filter(matched_hh == FALSE) %>% 
+                                distinct(in_i) %>% 
+                                nrow(), 
+                              "household IDs (in the individual data) are missing\n")),
+            crayon::red(paste("This has resulted in", matched_hh %>% 
+                                filter(matched_hh == FALSE) %>% 
+                                nrow(), 
+                              "individual questionnaires being unable to be linked to household level data\n")),
             crayon::red("The household IDs of those without household questionnaires are stored in `match_questionnaires$no_h_questionnaires`\n"))
   }
   
+  # Store missing household IDs in individual questionnaire data
   no_h_questionnaires <- matched_hh %>%
     filter(matched_hh == FALSE) %>%
     distinct(in_i) %>%
     pull(in_i)
   
+  # Check if all households have at least one associated individual questionnaire
   if(all(matched_i$matched_i) == TRUE) {
-    
-    message(crayon::green("Check 2: PASS Households have at least one associated individual questionnaire\n\n"),
-            crayon::green("The following table shows the number of individuals who have completed questionnaires within a household\nThe aim is for 3 individuals per household\n"),
+    message(crayon::green("Check 2b: PASS Households have at least one associated individual questionnaire\n\n"),
+            crayon::green("The following table shows the number of individuals who have completed questionnaires within a household\n
+                          The aim is for 3 individuals per household\n"),
             crayon::green(paste0(capture.output(data.frame(matched_i %>%
-                                          rename("n_individuals" = n) %>%
-                                          group_by(n_individuals) %>%
-                                          summarise(n_questionnaires = n()))), collapse = "\n")))
-    
+                                                             rename("n_individuals" = n) %>%
+                                                             group_by(n_individuals) %>%
+                                                             summarise(n_questionnaires = n()))), collapse = "\n")))
   } else {
-    
-    message(crayon::red("Check 2: FAIL Some households have no associated individual questionnaires\n\n"),
-            crayon::red(paste0("Households come from the following villages: ", combine_words(unique(str_split(matched_i$in_hh, "-", simplify = TRUE)[, 1]))), "\n"),
+    # Display message for households with no associated individual questionnaires
+    message(crayon::red("Check 2b: FAIL Some households have no associated individual questionnaires\n\n"),
+            crayon::red(paste0("Households come from the following villages: ", 
+                               combine_words(unique(str_split(matched_i$in_hh, "-", simplify = TRUE)[, 1]))), "\n"),
             crayon::red(paste0("Households with no individual questionnaires are shown below:\n")),
             crayon::red(paste0(capture.output(data.frame(matched_i %>%
                                                            filter(is.na(n)) %>%
@@ -94,6 +110,7 @@ check_match <- function(df = i_df_list$individual_main) {
                                                            summarise(n_households = n()))), collapse = "\n")),
             crayon::red("\nThe household IDs of those without individual questionnaires are stored in `match_questionnaires$no_i_questionnaires`"))
     
+    # Store missing household IDs in household questionnaire data
     no_i_questionnaires <- matched_i %>%
       filter(is.na(n)) %>%
       arrange(in_hh) %>%
@@ -106,6 +123,7 @@ check_match <- function(df = i_df_list$individual_main) {
   
 }
 
+# Execute the function and store the results
 match_questionnaires <- check_match(df = i_df_list$individual_main)
 
 
@@ -177,7 +195,6 @@ dbs_mismatch <- dbs_id_check(df = i_df_list$individual_main)
 # Check place of birth and residence -----------------------------------------
 # Clean state names within place of birth
 # Function to clean and standardize state names
-# All ChatGPT function - can't take any credit
 clean_state_names <- function(states, valid_states = nigeria_states) {
   # Function to find the closest match for a given string in a list
   find_closest_match <- function(str, valid_list) {
@@ -297,6 +314,7 @@ missing_rcs <- check_rcs(df = i_df_list$individual_main)
 
 missing_data <- list(missing_h_questionnaire = match_questionnaires$no_h_questionnaires,
                      missing_i_questionnaire = match_questionnaires$no_i_questionnaires,
+                     participant_id_missing = excluded$id,
                      missing_age = missing_age,
                      missing_names = missing_names,
                      missing_sex = missing_sex,
@@ -312,7 +330,7 @@ missing_data <- list(missing_h_questionnaire = match_questionnaires$no_h_questio
               mutate(interviewer_id = as_factor(interviewer_id))) %>%
   arrange(id, interviewer_id, date, missing)
 
-write_csv(missing_data, here("data", "missing", paste0("missing_", Sys.Date(), ".csv")))
+write_csv(missing_data, here("household_questionnaire", "data", "missing", paste0("missing_", Sys.Date(), ".csv")))
 
 # Save clean dataframe ----------------------------------------------------
 
@@ -340,5 +358,5 @@ clean_i_list <- list(individual_main = clean_i,
                      individual_hc_use = i_df_list$individual_hc_use,
                      individual_hc_prep = i_df_list$individual_hc_prep)
 
-write_rds(clean_i_list, here("data", "i_data", "i_df_list_cleaned.rds"))
+write_rds(clean_i_list, here("household_questionnaire", "data", "i_data", "i_df_list_cleaned.rds"))
 

@@ -9,7 +9,7 @@ Data checks are performed on the `hh_df_list` object which is read in `.rds` for
 
 **Arguments:**  
 
--   `df`: The dataframe containing household data. Default is hh_df_list$household_main.
+-   `df`: The dataframe containing household data. Default is `hh_df_list$household_main`.
 
 **Returns:**  
 
@@ -39,7 +39,7 @@ duplicate_records <- check_unique_id(df = hh_df_list$household_main)
 
 -   If the message "All household IDs are unique" is returned, this indicates that each household has a unique identifier in the data pulled down from the server.  
 -   The returned object is `NULL` if the check is passed.  
--   If the message "Duplicate household IDs found. Check duplicate_records for details" is returned, the study team should be contacted to correct the underlying data. If it is not possible for them to do this directly in the form the necessary correction can be made on the data stored in the server. Finally, if that is not possible the correction can be made directly in these scripts directly into the `hh_df_list$household_main` object.  
+-   If the message "Duplicate household IDs found. Check `duplicate_records` for details" is returned, the study team should be contacted to correct the underlying data. If it is not possible for them to do this directly in the form the necessary correction can be made on the data stored in the server. Finally, if that is not possible the correction can be made directly in these scripts directly into the `hh_df_list$household_main` object.  
 -   The returned object (`duplicate_records`) is a vector of values from the `hh_df_list$household_main$_index` column of the data. This can be used for further investigation of the duplication.  
 
 #### Check 2: Household coordinates  
@@ -181,9 +181,10 @@ correct_errors <- function(coords, factors, Nigeria) {
             bind_spat_cols(coords$coords_spat)
           # Replace the SpatVector in coords with the updated one
           coords$coords_spat <- updated_spatvector
-          potential_errors <- bind_rows(potential_errors, tibble("_index" = index, reason = if (crds(record)[,2] >= 14.0)
-            "corrected decimal point mistake (latitude high)" else
-              "corrected decimal point mistake (latitude low)"))
+          potential_errors <- bind_rows(potential_errors, tibble("_index" = index,
+                                                                 reason = ifelse(crds(record)[,2] >= 14.0),
+                                                                 "corrected decimal point mistake (latitude high)",
+                                                                 "corrected decimal point mistake (latitude low)"))
           correction_made <- TRUE
           break
         }
@@ -202,9 +203,10 @@ correct_errors <- function(coords, factors, Nigeria) {
             bind_spat_cols(coords$coords_spat)
           # Replace the SpatVector in coords with the updated one
           coords$coords_spat <- updated_spatvector
-          potential_errors <- bind_rows(potential_errors, tibble("_index" = index, reason = if (crds(record)[,1] >= 15.0)
-            "corrected decimal point mistake (longitude high)" else 
-              "corrected decimal point mistake (longitude low)"))
+          potential_errors <- bind_rows(potential_errors, tibble("_index" = index,
+                                                                 reason = ifelse(crds(record)[,1] >= 15.0),
+                                                                 "corrected decimal point mistake (longitude high)",
+                                                                 "corrected decimal point mistake (longitude low)"))
           correction_made <- TRUE
           break
         }
@@ -291,20 +293,20 @@ update_coordinates <- function(coords = coords_spat, df) {
 # Sub-function 5: Log Messages
 log_messages <- function(coords, checked_coords, corrected_coords) {
   # Coordinate Check 1
-  cat("Coordinate Check 1:\n")
-  cat(crayon::green(paste(bold(nrow(checked_coords$in_nigeria)),
-                          "records have coordinates within Nigeria.\n")))
-  cat(crayon::yellow(paste(bold(nrow(coords) - nrow(checked_coords$in_nigeria)),
-                           "records have coordinates falling outside of Nigeria.\n")))
-  cat(crayon::red(paste(bold(nrow(df) - nrow(coords)),
+  cat("Coordinate Check 1:\n",
+      crayon::green(paste(bold(nrow(checked_coords$in_nigeria),
+                          "records have coordinates within Nigeria.\n"))),
+      crayon::yellow(paste(bold(nrow(coords) - nrow(checked_coords$in_nigeria)),
+                           "records have coordinates falling outside of Nigeria.\n")),
+      crayon::red(paste(bold(nrow(df) - nrow(coords)),
                         "records have missing coordinates.\n")))
   # Summary
   unique_errors <- nrow(corrected_coords$potential_errors)
   cat(paste(unique_errors,
             "unique record(s) had incorrect coordinates.\n"))
   # Coordinate Check 2
-  cat("\nCoordinate Check 2:\n")
-  cat(crayon::red(paste(bold(nrow(checked_coords$out_lga)),
+  cat("\nCoordinate Check 2:\n",
+      crayon::red(paste(bold(nrow(checked_coords$out_lga)),
                         "records have coordinates outside of the correct LGAs.\n")))
   # Coordinate Check 3
   cat("\nCoordinate Check 3:\n")
@@ -314,8 +316,8 @@ log_messages <- function(coords, checked_coords, corrected_coords) {
     cat(crayon::yellow("No latitude and longitude swapping detected after correction.\n"))
   }
   # Coordinate Check 4
-  cat("\nCoordinate Check 4:\n")
-  cat(crayon::yellow(paste(bold(nrow(corrected_coords$potential_errors)),
+  cat("\nCoordinate Check 4:\n",
+      crayon::yellow(paste(bold(nrow(corrected_coords$potential_errors)),
                            "misplaced decimal points were detected and corrected.\n")))
 }
 ```

@@ -5,7 +5,8 @@ format:
    html:
       toc: true
       toc-depth: 4
-server: shiny
+      code-fold: true
+      code-summary: "Show the code"
 ---
 
 ```{r setup, echo=FALSE, message=FALSE}
@@ -39,7 +40,8 @@ library(tidyverse)
 library(tidyterra)
 library(units)
 
-knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(message = FALSE,
+                      warning = FALSE)
 
 project_CRS = "EPSG:4326"
 utm_nigeria_CRS = "EPSG:26332"
@@ -47,6 +49,8 @@ utm_nigeria_CRS = "EPSG:26332"
 village_state <- read_rds(here("project_wide_data", "village_state.rds"))
 hh_df <- read_rds(here("household_questionnaire", "data", "h_data", "hh_df_list_cleaned.rds"))
 hh_df$household_demographics <- zap_label(hh_df$household_demographics)
+i_df <- read_rds(here("household_questionnaire", "data", "i_data", "i_df_list_cleaned.rds"))
+i_df$individual_main <- zap_label(i_df$individual_main)
 village_colours <- read_rds(here("project_wide_data", "village_colours.rds"))
 
 ```
@@ -148,10 +152,12 @@ hh_ids <- hh_df$household_main %>%
 
 hh_sizes %>%
    left_join(hh_ids) %>%
+   group_by(village) %>%
+   mutate(facet_name = paste0(village, ", N = ", n())) %>%
    ggplot() +
    geom_bar(aes(x = n, fill = village)) +
    scale_fill_manual(values = village_colours) +
-   facet_wrap(~ village, scales = "free_x") +
+   facet_wrap(~ facet_name) +
    theme_bw() +
    labs(x = "Number of individuals in household",
         y = "Count",
@@ -250,9 +256,12 @@ if(!file.exists(here("project_wide_data", "spatial", "village_sampling.rds"))) {
    # geo sampling summary
    geo_sample_list <- vector("list", length = length(villages))
    
+   library("mgcv")
+   library("mgcViz")
+   
    for(i in seq_along(villages)) {
       
-      # set a buffer distance, initially 1km radius from the centre of the village or as far away as the furthest household sampled
+      # set a buffer distance, initially 1km radius from the centre of the village
       buffer_distance <- max(c(1000,ifelse(
          nrow(hh_vect[hh_vect$village %in% villages[i]$location, ]) > 0,
          max(distance(hh_vect[hh_vect$village %in% villages[i]$location, ], villages[i])),
@@ -263,7 +272,7 @@ if(!file.exists(here("project_wide_data", "spatial", "village_sampling.rds"))) {
       current_buffer <- buffer(villages_utm[i], buffer_distance)
       
       # subset buildings within village
-      buildings_in_village <- intersect(buildings_utm, current_buffer)
+      buildings_in_village <- terra::intersect(buildings_utm, current_buffer)
       
       # create presence variable
       buildings_in_village_df <- st_as_sf(buildings_in_village) %>%
@@ -318,11 +327,20 @@ if(!file.exists(here("project_wide_data", "spatial", "village_sampling.rds"))) {
          centroids() %>%
          as.data.frame(geom = "XY")
       
-      comparison_df <- bind_rows(current_sample, absence_points_df, presence_points_df) %>%
+      random_sample <- vect(sample(grid, size = nrow(current_sample))) %>%
+         centroids() %>%
+         as.data.frame(geom = "XY") %>%
+         mutate(sample = "Random")
+      
+      comparison_df <- bind_rows(current_sample %>%
+                                    mutate(class = "Household"),
+                                 absence_points_df %>%
+                                    mutate(class = "Absence"),
+                                 presence_points_df %>%
+                                    mutate(class = "Building"),
+                                 random_sample %>%
+                                    mutate(class = "Random")) %>%
          drop_na(x, y) %>%
-         mutate(class = case_when(!is.na(household_id) ~ "Household",
-                                  !is.na(confidence) ~ "Building",
-                                  TRUE ~ "Absence")) %>%
          select(class, x, y)
       
       comparison_df$predicted_values <- predict(gam_model_buildings, comparison_df, type = "response")
@@ -365,10 +383,35 @@ if(!file.exists(here("project_wide_data", "spatial", "village_sampling.rds"))) {
    write_rds(geo_sample_list, here("project_wide_data", "spatial", "village_sampling.rds"))
    village_sampling <- geo_sample_list
    
-} else {
+   } else {
    
    village_sampling <- read_rds(here("project_wide_data", "spatial", "village_sampling.rds"))
    
+   for(i in 1:length(village_sampling)) {
+      
+      # households sampled
+      hh_list <- hh_df$household_main %>%
+         select(household_id, latitude, longitude) %>%
+         mutate(abbreviation = str_split(household_id, "-", simplify = TRUE)[, 1]) %>%
+         left_join(., village_state) %>%
+         select(household_id, village, latitude, longitude)
+      
+      village_name <- unique(village_sampling[[i]]$summary_geo$village)
+      
+      hh_vect <- vect(hh_list %>%
+                         filter(village == village_name), geom = c("longitude", "latitude"), crs = project_CRS)
+      
+      if(length(hh_vect) >= 1) {
+         
+         village_sampling[[i]]$sample_plot <- village_sampling[[i]]$sample_plot +
+            geom_spatvector(data = hh_vect,
+                            colour = "orange", inherit.aes = FALSE, alpha = 0.8)
+         
+      } else {
+         
+         village_sampling[[i]]$sample_plot <- village_sampling[[i]]$sample_plot
+      }
+   }
 }
 
 names(village_sampling) <- village_state$village
@@ -499,41 +542,72 @@ Occupation as a measure of representativeness will be assessed comparing the ind
 | Pensioner | Not working/NA/Did not work | N/A | N/A |
 | Other | Unskilled manual/Services | Elementary Occupations | 9 | 
 
+n.b. In the SCAPES survey the question is phrased around sources of income. Therefore, individuals may have more than one occupation, for example if they are a teacher but also farm.
+
+```{r scapes-occupation}
+
+occupation_df <- i_df$individual_main %>%
+   select(id, sex, age, state_residence, income) %>%
+   filter(age >= 15) %>%
+   separate_rows(income, sep = " ") %>% # One row per source of income
+   mutate(dhs_manual = case_when(str_detect(income, "ag_|farm|hunt|fish|ntfp|animal") ~ "Agriculture",
+                                 str_detect(income, "trader") ~ "Sales",
+                                 str_detect(income, "artisan") ~ "Skilled manual",
+                                 str_detect(income, "driver") ~ "Other",
+                                 str_detect(income, "other") ~ "Unskilled manual",
+                                 str_detect(income, "clergy|teacher|government_worker") ~ "Professional/technical/managerial",
+                                 str_detect(income, "student|pensioner") ~ NA)) %>%
+   distinct(id, sex, age, state_residence, dhs_manual) %>%
+   ungroup() %>%
+   group_by(state_residence)
+
+occupation_list <- group_split(occupation_df)
+
+names(occupation_list) <- str_remove_all(group_keys(occupation_df)$state_residence, " State")
+
+```
+
+
 ::: {.panel-tabset}
 
 #### Benue
 
-DHS sample: N = 1,634 (Female = 1,278; Male = 356), median age = 28 (Female = 27, Male = 32).
+DHS sample: N = 1,634 (Female = 1,278; Male = 356), median age = 28 (Female = 27, Male = 32).  
+SCAPES sample: N = `r length(unique(occupation_list[[1]]$id))` (Female = `r nrow(occupation_list[[1]] %>% filter(sex == "Female") %>% distinct(id))`; Male = `r nrow(occupation_list[[1]] %>% filter(sex == "Male") %>% distinct(id))`), median age = `r median(occupation_list[[1]] %>% distinct(id, age) %>% pull(age), na.rm = TRUE)` (Female = `r median(occupation_list[[1]] %>% filter(sex == "Female") %>% distinct(id, age) %>% pull(age), na.rm = TRUE)` Male = `r median(occupation_list[[1]] %>% filter(sex == "Male") %>% distinct(id, age) %>% pull(age), na.rm = TRUE)`).
 
 ```{r dhs-occupation-benue}
-nigeria_dhs <- read_rds(here("miscellaneous", "data", "nigeria_dhs.rds"))
+nigeria_dhs <- read_rds(here("miscellaneous", "data", "nigeria_dhs.rds")) %>%
+   mutate(occupation = fct_drop(case_when(str_detect(occupation, "Agric") ~ as_factor("Agriculture"),
+                                 is.na(occupation) ~ as_factor(NA),
+                                 str_detect(occupation, "Not working|Did not work|Don't know") ~ as_factor(NA),
+                                 TRUE ~ as_factor(occupation))))
 
-generate_occupation_plot <- function(state_name) {
+generate_occupation_plot <- function(state_name, SCAPES = TRUE) {
    
    if(state_name == "Nigeria") state_name = str_c(unique(nigeria_dhs$state), collapse = "|")
    
    dhs_state <- nigeria_dhs %>%
       filter(str_detect(state, state_name)) %>%
-      group_by(sex, isco) %>%
+      group_by(sex, occupation) %>%
       summarise(n = n()) %>%
       group_by(sex) %>%
       mutate(
          percent = round(n / sum(n) * 100, 1),
-         isco = fct_relevel(fct_na_value_to_level(fct_rev(as_factor(isco)), level = NA), NA, after = 0)
+         occupation = fct_relevel(fct_na_value_to_level(fct_rev(as_factor(occupation)), level = NA), NA, after = 0)
       )
    
    dhs_state_rural_urban <- nigeria_dhs %>%
       filter(str_detect(state, state_name)) %>%
-      group_by(sex, setting, isco) %>%
+      group_by(sex, setting, occupation) %>%
       summarise(n = n()) %>%
       group_by(sex, setting) %>%
       mutate(
          percent = round(n / sum(n) * 100, 1),
-         isco = fct_relevel(fct_na_value_to_level(fct_rev(as_factor(isco)), level = NA), NA, after = 0)
+         occupation = fct_relevel(fct_na_value_to_level(fct_rev(as_factor(occupation)), level = NA), NA, after = 0)
       )
    
    occupation_plot <- dhs_state %>%
-      ggplot(aes(x = sex, fill = isco, y = percent, label = paste0(percent, "%"))) +
+      ggplot(aes(x = sex, fill = occupation, y = percent, label = paste0(percent, "%"))) +
       geom_col() +
       geom_text_repel(
          position = position_stack(vjust = 0.5),
@@ -542,7 +616,7 @@ generate_occupation_plot <- function(state_name) {
          segment.color = "grey",
          segment.size = 0.2
       ) +
-      scale_fill_brewer(palette = "Dark2", na.value = "grey50") +
+      scale_fill_brewer(palette = "Dark2", na.value = "white") +
       theme_bw() +
       labs(
          y = "%",
@@ -550,30 +624,66 @@ generate_occupation_plot <- function(state_name) {
          fill = "Occupation"
       )
    
-   occupation_rural_urban_plot <- dhs_state_rural_urban %>%
-      ggplot(aes(x = sex, fill = isco, y = percent, label = paste0(percent, "%"))) +
-      geom_col() +
-      geom_text_repel(
-         position = position_stack(vjust = 0.5),
-         box.padding = 0.5,
-         point.padding = 0.1,
-         segment.color = "grey",
-         segment.size = 0.2
-      ) +
-      scale_fill_brewer(palette = "Dark2", na.value = "grey50") +
-      facet_wrap(~ setting, scales = "free", ncol = 2) +
-      theme_bw() +
-      labs(
-         y = "%",
-         x = element_blank(),
-         fill = "Occupation"
-      ) +
-      guides(fill = "none")
+   if(SCAPES == TRUE) {
+      
+      study_pop <- occupation_list[[state_name]] %>%
+         drop_na(sex) %>%
+         group_by(sex, dhs_manual) %>%
+         summarise(n = n()) %>%
+         group_by(sex) %>%
+         mutate(setting = as_factor("Study villages"),
+                percent = round(n / sum(n) * 100, 1),
+                occupation = fct_relevel(fct_na_value_to_level(fct_rev(as_factor(dhs_manual)), level = NA), NA, after = 0)) %>%
+         select(-dhs_manual)
+      
+      occupation_rural_urban_plot <- bind_rows(dhs_state_rural_urban, study_pop) %>%
+         ggplot(aes(x = sex, fill = occupation, y = percent, label = paste0(percent, "%"))) +
+         geom_col() +
+         geom_text_repel(
+            position = position_stack(vjust = 0.5),
+            box.padding = 0.5,
+            point.padding = 0.1,
+            segment.color = "grey",
+            segment.size = 0.2
+         ) +
+         scale_fill_brewer(palette = "Dark2", na.value = "white") +
+         facet_wrap(~ setting, scales = "free", ncol = 3) +
+         theme_bw() +
+         labs(
+            y = "%",
+            x = element_blank(),
+            fill = "Occupation"
+         ) +
+         guides(fill = "none")
+      
+   } else {
+      
+      occupation_rural_urban_plot <- dhs_state_rural_urban %>%
+         ggplot(aes(x = sex, fill = occupation, y = percent, label = paste0(percent, "%"))) +
+         geom_col() +
+         geom_text_repel(
+            position = position_stack(vjust = 0.5),
+            box.padding = 0.5,
+            point.padding = 0.1,
+            segment.color = "grey",
+            segment.size = 0.2
+         ) +
+         scale_fill_brewer(palette = "Dark2", na.value = "white") +
+         facet_wrap(~ setting, scales = "free", ncol = 2) +
+         theme_bw() +
+         labs(
+            y = "%",
+            x = element_blank(),
+            fill = "Occupation"
+         ) +
+         guides(fill = "none") 
+      
+   }
    
    return(list(occupation_plot, occupation_rural_urban_plot))
 }
 
-benue_occupation <- generate_occupation_plot("Benue")
+benue_occupation <- generate_occupation_plot("Benue", SCAPES = TRUE)
 benue_occupation[[1]]
 benue_occupation[[2]]
 ```
@@ -585,7 +695,7 @@ DHS sample: N = 949 (Female = 748; Male = 201), median age = 31 (Female = 30, Ma
 
 ``` {r dhs-occupation-cross-river}
 
-cr_occupation <- generate_occupation_plot("Cross River")
+cr_occupation <- generate_occupation_plot("Cross River", SCAPES = FALSE)
 cr_occupation[[1]]
 cr_occupation[[2]]
 
@@ -597,7 +707,7 @@ DHS sample: N = 1,666 (Female = 1,310; Male = 356), median age = 31 (Female = 29
 
 ``` {r dhs-occupation-ebonyi}
 
-ebonyi_occupation <- generate_occupation_plot("Ebonyi")
+ebonyi_occupation <- generate_occupation_plot("Ebonyi", SCAPES = FALSE)
 ebonyi_occupation[[1]]
 ebonyi_occupation[[2]]
 
@@ -610,7 +720,7 @@ DHS sample: N = 55,132 (Female = 41,821; Male = 13,331), median age = 29 (Female
 
 ``` {r dhs-occupation-nigeria}
 
-nigeria_occupation <- generate_occupation_plot("Nigeria")
+nigeria_occupation <- generate_occupation_plot("Nigeria", SCAPES = FALSE)
 nigeria_occupation[[1]]
 nigeria_occupation[[2]]
 
@@ -620,13 +730,33 @@ nigeria_occupation[[2]]
 
 ### Education
 
+```{r scapes-education}
+
+education_df <- i_df$individual_main %>%
+   select(id, sex, age, state_residence, education) %>%
+   mutate(education = case_when(str_detect(education, "Other|None") ~ "No education",
+                                str_detect(education, "Primary") ~ "Primary",
+                                str_detect(education, "secondary") ~ "Secondary",
+                                str_detect(education, "University") ~ "Higher",
+                                TRUE ~ "No education")) %>%
+   distinct(id, sex, state_residence, education) %>%
+   ungroup() %>%
+   group_by(state_residence)
+
+education_list <- group_split(education_df)
+
+names(education_list) <- str_remove_all(group_keys(education_df)$state_residence, " State")
+
+```
+
+
 ::: {.panel-tabset}
 
 #### Benue
 
 ```{r dhs-education-benue}
 
-generate_education_plot <- function(state_name) {
+generate_education_plot <- function(state_name, SCAPES = TRUE) {
    
    if(state_name == "Nigeria") state_name = str_c(unique(nigeria_dhs$state), collapse = "|")
    
@@ -668,6 +798,41 @@ generate_education_plot <- function(state_name) {
          fill = "Education"
       )
    
+   if(SCAPES == TRUE) {
+      
+      study_pop <- education_list[[state_name]] %>%
+         drop_na(sex) %>%
+         group_by(sex, education) %>%
+         summarise(n = n()) %>%
+         group_by(sex) %>%
+         mutate(setting = as_factor("Study villages"),
+                percent = round(n / sum(n) * 100, 1))
+      
+      
+   education_rural_urban_plot <- bind_rows(dhs_state_rural_urban, study_pop) %>%
+      mutate(education = fct(education, levels = levels(dhs_state_rural_urban$education))) %>%
+      ggplot(aes(x = sex, fill = education, y = percent, label = paste0(percent, "%"))) +
+      geom_col() +
+      geom_text_repel(
+         position = position_stack(vjust = 0.5),
+         box.padding = 0.5,
+         point.padding = 0.1,
+         segment.color = "grey",
+         segment.size = 0.2
+      ) +
+      scale_fill_brewer(palette = "Set3", na.value = "grey50") +
+      facet_wrap(~ setting, scales = "free", ncol = 3) +
+      theme_bw() +
+      labs(
+         y = "%",
+         x = element_blank(),
+         fill = "Education"
+      ) +
+      guides(fill = "none")
+   
+   } else {
+      
+      
    education_rural_urban_plot <- dhs_state_rural_urban %>%
       ggplot(aes(x = sex, fill = education, y = percent, label = paste0(percent, "%"))) +
       geom_col() +
@@ -687,12 +852,14 @@ generate_education_plot <- function(state_name) {
          fill = "Education"
       ) +
       guides(fill = "none")
+      
+   }
    
    return(list(education_plot, education_rural_urban_plot))
    
 }
 
-benue_education <- generate_education_plot("Benue")
+benue_education <- generate_education_plot("Benue", SCAPES = TRUE)
 benue_education[[1]]
 benue_education[[2]]
 
@@ -703,7 +870,7 @@ benue_education[[2]]
 
 ```{r dhs-education-cross-river}
 
-cr_education <- generate_education_plot("Cross River")
+cr_education <- generate_education_plot("Cross River", SCAPES = FALSE)
 cr_education[[1]]
 cr_education[[2]]
 
@@ -713,7 +880,7 @@ cr_education[[2]]
 
 ```{r dhs-education-ebonyi}
 
-ebonyi_education <- generate_education_plot("Ebonyi")
+ebonyi_education <- generate_education_plot("Ebonyi", SCAPES = FALSE)
 ebonyi_education[[1]]
 ebonyi_education[[2]]
 
@@ -723,7 +890,7 @@ ebonyi_education[[2]]
 
 ```{r dhs-education-nigeria}
 
-nigeria_education <- generate_education_plot("Nigeria")
+nigeria_education <- generate_education_plot("Nigeria", SCAPES = FALSE)
 nigeria_education[[1]]
 nigeria_education[[2]]
 

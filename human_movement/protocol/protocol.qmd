@@ -1,0 +1,25 @@
+---
+title: "SCAPES: Human movement study"
+author: 
+  - "David Simons"
+  - "Kate Thompson"
+date: today
+format:
+  html:
+    toc: true
+    code-fold: true
+bibliography: references.bib
+---
+
+# Introduction  
+
+## Aims  
+
+# Methods  
+
+# Analysis plan  
+
+# References  
+
+::: {#refs}
+:::

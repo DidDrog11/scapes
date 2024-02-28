@@ -221,6 +221,8 @@ clean_coordinates <- function(df = hh_df_list$household_main) {
 
 coords <- clean_coordinates(df = hh_df_list$household_main)
 
+if(nrow(coords) == nrow(hh_df_list$household_main)) hh_df_list$household_main <- coords
+
 # Cleaning XXXX -----------------------------------------------------------
 
 

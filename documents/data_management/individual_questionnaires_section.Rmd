@@ -817,19 +817,19 @@ Consent is captured after initialising the questionnaire. We do this to aid unde
 **Type of Data:** Multiple-select
 
 **Options for Responses:**    
-- Option 1: Rabbit  
-- Option 2: Giant pouched rat  
-- Option 3: Grasscutter  
-- Option 4: Monkey  
-- Option 5: Porcupine (Chuku chuku)  
-- Option 6: Squirrel  
-- Option 7: Other rats  
-- Option 8: Deer (Duiker/Antelope/Bush goat)  
-- Option 9: Snake  
-- Option 10: Birds  
-- Option 11: Shrew  
-- Option 12: None  
-- Option 13: Other  
+- Option 1: Rabbit (Code: rabbit)  
+- Option 2: Giant pouched rat (Code: giant_rat)  
+- Option 3: Grasscutter (Code: grasscutter)  
+- Option 4: Monkey (Code: monkey)  
+- Option 5: Porcupine (Chuku chuku) (Code: porcupine)  
+- Option 6: Squirrel (Code: squirrel)  
+- Option 7: Other rats (Code: rat_other)  
+- Option 8: Deer (Duiker/Antelope/Bush goat) (Code: deer)  
+- Option 9: Snake (Code: snake)  
+- Option 10: Birds (Code: birds)  
+- Option 11: Shrew (Code: shrew)  
+- Option 12: None (Code: none)  
+- Option 13: Other (Code: other)  
 
 ---
 

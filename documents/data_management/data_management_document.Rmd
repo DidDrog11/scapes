@@ -74,6 +74,11 @@ Within questionnaires these repeats may be conditional and so each main question
 ```
 
 
+### Individual questionnaire data checks:
+
+```{r child = "individual_questionnaires_checks.Rmd"}
+```
+
 Linking IDs to samples?  
 
 ### Human serology  
