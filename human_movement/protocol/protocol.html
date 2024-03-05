@@ -8,7 +8,7 @@
 
 <meta name="author" content="David Simons">
 <meta name="author" content="Kate Thompson">
-<meta name="dcterms.date" content="2024-02-26">
+<meta name="dcterms.date" content="2024-03-05">
 
 <title>SCAPES: Human movement study</title>
 <style>
@@ -71,7 +71,13 @@ div.csl-indent {
   <ul class="collapse">
   <li><a href="#aims" id="toc-aims" class="nav-link" data-scroll-target="#aims">Aims</a></li>
   </ul></li>
-  <li><a href="#methods" id="toc-methods" class="nav-link" data-scroll-target="#methods">Methods</a></li>
+  <li><a href="#methods" id="toc-methods" class="nav-link" data-scroll-target="#methods">Methods</a>
+  <ul class="collapse">
+  <li><a href="#study-site-selection" id="toc-study-site-selection" class="nav-link" data-scroll-target="#study-site-selection">Study site selection</a></li>
+  <li><a href="#village-structure" id="toc-village-structure" class="nav-link" data-scroll-target="#village-structure">Village structure</a></li>
+  <li><a href="#participant-selection" id="toc-participant-selection" class="nav-link" data-scroll-target="#participant-selection">Participant selection</a></li>
+  <li><a href="#movement-tracking" id="toc-movement-tracking" class="nav-link" data-scroll-target="#movement-tracking">Movement tracking</a></li>
+  </ul></li>
   <li><a href="#analysis-plan" id="toc-analysis-plan" class="nav-link" data-scroll-target="#analysis-plan">Analysis plan</a></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
@@ -99,7 +105,7 @@ div.csl-indent {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">February 26, 2024</p>
+      <p class="date">March 5, 2024</p>
     </div>
   </div>
   
@@ -113,10 +119,39 @@ div.csl-indent {
 <h1>Introduction</h1>
 <section id="aims" class="level2">
 <h2 class="anchored" data-anchor-id="aims">Aims</h2>
+<ol type="1">
+<li>Describe pattern of space use in three rural communities in Nigeria.<br>
+</li>
+<li>Estimate locations of hazard through space-sharing with potentially infected rodents. Validation through serology?</li>
+<li>Explore heterogeneity in cumulative hazard across age, occupation, sex and socio-economic strata.</li>
+</ol>
 </section>
 </section>
 <section id="methods" class="level1">
 <h1>Methods</h1>
+<section id="study-site-selection" class="level2">
+<h2 class="anchored" data-anchor-id="study-site-selection">Study site selection</h2>
+<p>Focal villages (one village from each state) have previously been identified as part of the SCAPES programme. Focal villages represent an archetypal village structure and size for each of Benue, Cross River and Ebonyi states in Southern Nigeria. Two neighbouring villages for each of the focal villages have been studied as part of a cross-sectional survey of the region for the SCAPES programme. Dyegh, has been identified as the focal village for Benue, it contains 305 households with an estimated 2,500 (1,830-2,821) individuals. Surveys have been completed with 210 individuals, from 64 households, representing 9% of the expected village population and 21% of the households within the village. … for remaining focal villages (Okimbongha and Ezeakataka).</p>
+</section>
+<section id="village-structure" class="level2">
+<h2 class="anchored" data-anchor-id="village-structure">Village structure</h2>
+<p>Village organisation across the three focal villages varies substantially. In Cross River, our study villages are orientated along the course of a river, which is common for the region. Buildings, and households, are concentrated along an axis perpendicular to the river flow with agricultural land surrounding the nucleus of buildings on both sides of the river. In Ebonyi, study villages are less clustered with villages comprising dispersed grouping of buildings and households, which may be organised as compounds. Surrounding and interspersed between these buildings is agricultural land that may be worked by the nearby households. The organisation of villages within Benue lies between these extremes, with buildings and households clustered around larger roads, compounds are less demarcated and fewer agricultural areas lie interspersed within the village.</p>
+<p>The location and organisation of each focal village is shown below.</p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="protocol_files/figure-html/map-villages-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="participant-selection" class="level2">
+<h2 class="anchored" data-anchor-id="participant-selection">Participant selection</h2>
+<p>Purposeful selection of households to enroll in the human movement study was conducted. Households were assigned to cell within a 9x9 grid overlain to sampled households within a focal village. Households from within the village were randomly chosen from each of the cells until 70 individuals from within the households consented to participate.We aimed to enrol an equal proportion of adult males, adult females and children of both sexes. Individuals were enrolled and instructed to keep the movement tracking device on them at all times for a 14 day period. At the end of each day participants were asked to complete a diary card which indicated the time spent conducting pre-specified activities during the day. The study team visited each participant 4 times during the study period to support adherence to the study protocol and answer any questions the participant may have had.</p>
+</section>
+<section id="movement-tracking" class="level2">
+<h2 class="anchored" data-anchor-id="movement-tracking">Movement tracking</h2>
+<p>iGotU devices were programmed to poll for GPS locations at 90 second intervals without interruption for a 14 day period from when the participant enrolled in the study. Each device is able to store X records and has a battery life of Y days, neither of these are expected to impact data completeness. Devices were recharged and data were offloaded between each participant. If required the study team could charge devices on behalf of participants, the participants were asked to monitor for low battery on a daily basis.</p>
+<p>Accuracy of location was recorded for each GPS observation using HDOP and number of visible satellites. This measure of accuracy was used to impute the possible locations of a device at each timepoint with an associated confidence of location. For each participant we converted these point and time locations to a continuous space use raster where the amount of time spent in each cell was recorded (<em>what cell size would be reasonable given accuracy of devices</em>).</p>
+</section>
 </section>
 <section id="analysis-plan" class="level1">
 <h1>Analysis plan</h1>
