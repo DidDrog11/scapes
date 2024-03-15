@@ -1,0 +1,79 @@
+---
+title: Biased random bridge kernal method
+toc: true
+toc-location: left
+code-fold: true
+---
+
+# Motivation
+
+Kernal density estimations are commonly used to explore space use. The Brownian bridge kernel method places a kernel function above each *step* of the trajectory (a step is the straight line connecting two successive relocations). This method takes into account not only the position of the relocations, but also the path travelled by the animal between successive relocations. 
+
+![Relocations: Here relocations are located in three patches. The use of these patches though are ordered, as shown with the trajectories. The Brownian bridge method allows the association between the patches to be included in the space use kernal density estimation.](BRB_example.png)
+
+This approach is advanced by adopting the biased random walk model. Here, a trajectory is decomposed into a succession of *steps*, each characterised by a speed and an angle with the east direction. The trajectories are generated as biased random walks when the probability density distribution of the angles is not uniform (i.e., there is a preferred direction of travel). Therefore, this does not suppose a purely diffusive movement, unlike the Brownian bridge (above). 
+
+We intend to record human movement in a Lassa fever endemic region. We will combine this with habitat use/landuse data and rodent occurrence to estimate time at risk for infection with LASV. We are taking a similar approach to Fornace *et al.* 2019.
+
+# Example
+
+Data collected from a GPS device, carried for one week, with polling every 90 seconds has been used to explore the modelling pipeline. The `R` package `adehabitatHR` contains the functions to convert the geospatial and temporal data from the GPS recordings into a space use representation for estimating trajectories and modelling probability of use. Other packages used to handle time data (`lubridate`), spatial data (`terra`, `sf`) are required. Throughout I use `here` to produce relative paths and `tidyverse` for data manipulation.
+
+Data were collected in San Diego, USA, conversion from EPSG:4326 (lat, lon) to equal distance projections of EPSG:32610 (UTM) are used to allow distances to be included.
+
+## Load packages
+
+You may need to install the packages if you do not already have them.
+
+```{r load-packages}
+
+library(here)
+library(lubridate)
+library(adehabitatHR)
+library(terra)
+library(tidyterra)
+library(tidyverse)
+library(units)
+
+conflicted::conflict_prefer("select", "dplyr")
+conflicted::conflict_prefer("filter", "dplyr")
+conflicted::conflict_prefer("buffer", "terra")
+
+project_crs <- "EPSG:4326"
+SD_crs <- "EPSG:32610"
+
+```
+
+## Load and process data
+
+Data has been downloaded from the igotu GPS tracker and stored as `week_test.csv`. We read this in from the `.csv` file. It contains time-stamped recordings of location. Additional movement data is included but currently this is not used. `local_datetime` is produced using the device recorded `Local Time` and the `Region` timezone.
+
+```{r load-data, message = FALSE}
+
+gps <- read_csv(here("human_movement", "data", "test", "week_test.csv")) %>%
+  mutate(utc_datetime = ymd_hms(Time)) %>%
+  group_by(Region) %>%
+  mutate(local_datetime = with_tz(ymd_hms(`Local Time`), tzone = unique(Region))) %>%
+  ungroup() %>%
+  rename("y" = Latitude,
+         "x" = Longitude,
+         "altitude" = `Altitude(m)`,
+         "speed" = `Speed(km/h)`,
+         "heading" = Course,
+         "distance" = `Distance(m)`,
+         "satellites" = `Visible Satellites`,
+         "satellites_cn22" = `Satellites(CN>22)`) %>%
+  mutate(altitude = as_units(altitude, "m"),
+         speed = as_units(speed, "km/h"),
+         distance = as_units(distance, "m"),
+         INDEX = row_number()) %>%
+  select(INDEX, utc_datetime, local_datetime, x, y, altitude, speed, heading, distance, satellites, satellites_cn22, HDOP) %>%
+  filter(local_datetime <= ymd_hms("2024-03-10 03:09:55", tz = "America/Los_Angeles"))
+
+head(gps[sample(1:nrow(gps), 10), ] %>%
+       select(INDEX, local_datetime, x, y), 10) %>%
+  arrange(INDEX)
+
+```
+
+This table shows 10 random rows of the `gps` dataset. There are 5,041 observations between `r min(as_date(gps$local_datetime))` and `r max(as_date(gps$local_datetime))`. We would expect 7,296 from this period so 31% of expected data are missing.

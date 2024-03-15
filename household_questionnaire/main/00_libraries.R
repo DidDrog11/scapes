@@ -60,6 +60,7 @@ village_state <- tibble(village_state,
                         village_colour = colour_table$village_colour,
                         state_colour = colour_table$state_colour)
 
+dir.create(here("project_wide_data"))
 write_rds(village_state, here("project_wide_data", "village_state.rds"))
 
 village_colours <- setNames(village_state$village_colour, village_state$village)
@@ -97,3 +98,6 @@ nigeria_states <- c("Abia", "Adamawa", "Akwa Ibom", "Anambra", "Bauchi", "Bayels
                     "Kaduna", "Kano", "Katsina", "Kebbi", "Kogi", "Kwara", "Lagos", "Nasarawa", "Niger", 
                     "Ogun", "Ondo", "Osun", "Oyo", "Plateau", "Rivers", "Sokoto", "Taraba", "Yobe", "Zamfara",
                     "Federal Capital Territory")
+
+Nigeria <- gadm(country = "NGA", level = 0, path = here("project_wide_data", "spatial"))
+lga <- gadm(country = "NGA", level = 2, path = here("project_wide_data", "spatial"))

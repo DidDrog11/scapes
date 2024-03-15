@@ -1,8 +1,11 @@
 
 # Import questionnaire ----------------------------------------------------
-# drive_download("https://docs.google.com/spreadsheets/d/12YWDQxcQwth4-c7-gDpAEoLgUVx25yfm/edit?usp=drive_link&ouid=109198876678825407497&rtpof=true&sd=true",
-#                    path = here("questionnaire", "i_questionnaire_current.xlsx"),
-#                overwrite = TRUE)
+if(!file.exists(here("household_questionnaire", "questionnaire", "i_questionnaire_current.xlsx"))) {
+  dir.create(here("household_questionnaire", "questionnaire"))
+  drive_download("https://docs.google.com/spreadsheets/d/12YWDQxcQwth4-c7-gDpAEoLgUVx25yfm/edit?usp=drive_link&ouid=109198876678825407497&rtpof=true&sd=true",
+                 path = here("household_questionnaire", "questionnaire", "i_questionnaire_current.xlsx"),
+                 overwrite = TRUE)
+}
 
 i_questions <- read_xlsx(path = here("household_questionnaire", "questionnaire", "i_questionnaire_current.xlsx"))
 

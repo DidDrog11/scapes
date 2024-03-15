@@ -1,7 +1,7 @@
 #username = "ds1987"
 #url = "https://kf.kobotoolbox.org/"
 
-#kobo_token(username = username,
+# kobo_token(username = username,
 #           password = password,
 #           url = url)
 

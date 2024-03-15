@@ -58,7 +58,7 @@ gps_df <- sf::st_as_sf(gps_vect) %>%
 ext <- ext(buffer(gps_vect, 1000))
 r_SD <- rast(ext, res = 50, crs = SD_crs)
 # requires raster for the conversion
-# library(raster)
+library(raster)
 p_SD <- as(as.points(r_SD), "Spatial")
 # sp may be loaded by another package, if not it's needed for this
 # library(sp)
@@ -99,52 +99,163 @@ summary(d3)
 
 
 # Utilisation distribution ------------------------------------------------
-# Set Tmax as the maximum time between steps (in seconds) - set as 25 minutes
 # Maximum threshold between points before they were considered uncorrelated set as 3 hr based on typical reported activity times. 
 # Is this an activity from home to somewhere and back? If so 9 may be more suitable in our settings (i.e., day in the field)
-tmax <- (60*25)
+tmax <- (60*60*3)
 # Set minimum distance between relocations (anything less is immobile - account for GPS error; use coordinate units)
-lmin <- 10
+lmin <- 50
 # Set minimum smoothing parameter, should be equal to SD of GPS error or resolution of habitat map
 # We can calculate this from our data in Nigeria, may be worth doing a couple of calibrations (i.e., in Abakaliki, a field, a forest and a local house)
-hmin <- 5
+hmin <- 100
+# Tau
+tau <- 90
 # If not using habitat, set cell (higher is smaller cells)
-cell <- 100
+cell <- 200
 # Set maximum time allowed to spend outside patch before considering having left
 # Set as 10 minutes
-maxT <- 60*10
+maxt <- 60*10
 # Set filtershort
 ## If TRUE, track segments shorter than Lmin are assumed to correspond to resting
 ## If FALSE, short segments are taken into account when not associate with resting
-filtershort <- TRUE
+filtershort <- FALSE
 
 ## Estimate the diffusion component
 diffusion <- BRB.D(d3, Tmax = tmax, Lmin = lmin, habitat = NULL, activity = NULL)
 diffusion
 
 ## Estimate utilisation distribution
-ud <- BRB(d3, D = diffusion, Tmax = tmax, Lmin = lmin, hmin = hmin, type = "UD",
+ud <- BRB(d3, D = diffusion, Tmax = tmax, tau = tau, Lmin = lmin, hmin = hmin, maxt = maxt, type = "UD",
+          b = FALSE, same4all = FALSE, extent = 0.1, grid = 370)
+id <- BRB(d3, D = diffusion, Tmax = tmax, tau = tau, Lmin = lmin, hmin = hmin, maxt = maxt, type = "ID",
+          b = FALSE, same4all = FALSE, extent = 0.1, grid = 370)
+rd <- BRB(d3, D = diffusion, Tmax = tmax, tau = tau, Lmin = lmin, hmin = hmin, maxt = maxt, type = "RD",
           b = FALSE, same4all = FALSE, extent = 0.1, grid = 370)
 
 summary(ud)
+summary(id)
+summary(rd)
 
-SD_dens <- tibble(x = ud@coords[, 1],
-                  y = ud@coords[, 2],
-                  density = ud$dens)
+vol_ud <- getvolumeUD(ud) %>%
+  rast()
+rast_ud <- rast(ud)
+rast_ud[rast_ud == 0] <- NA
+names(vol_ud) <- "Utilisation Distribution"
+names(rast_ud) <- "Utilisation Distribution"
+crs(vol_ud) <- SD_crs
+crs(rast_ud) <- SD_crs
+vol_id <- getvolumeUD(id) %>%
+  rast()
+rast_id <- rast(id)
+rast_id[rast_id == 0] <- NA
+names(vol_id) <- "Intensity Distribution"
+names(rast_id) <- "Intensity Distribution"
+crs(vol_id) <- SD_crs
+crs(rast_id) <- SD_crs
+vol_rd <- getvolumeUD(rd) %>%
+  rast()
+rast_rd <- rast(rd)
+rast_rd[rast_rd == 0] <- NA
+names(vol_rd) <- "Recursion Distribution"
+names(rast_rd) <- "Recursion Distribution"
+crs(vol_rd) <- SD_crs
+crs(rast_rd) <- SD_crs
 
-dens_vect <- SD_dens %>%
+comb_rast_ud <- c(rast_ud, rast_id, rast_rd)
+
+decomposing_rast_ud <- ggplot() + 
+  geom_spatraster(data = comb_rast_ud) +
+  geom_spatraster_contour(data = comb_rast_ud, bins = 5) +
+  scale_fill_viridis_c(option = "magma") +
+  facet_wrap(~lyr) +
+  coord_sf() +
+  labs(fill = "Probability density",
+     caption = "Utilisation distribution = probability density that an animal is found at a point\n
+       Intensity distribution = average residency time\n
+       Recursion distribution = reflecting the number of visits") +
+  theme_minimal()
+
+comb_vol_ud <- c(vol_ud, vol_id, vol_rd)
+  
+decomposing_vol_ud <- ggplot() + 
+  geom_spatraster(data = comb_vol_ud) +
+  geom_spatraster_contour(data = comb_vol_ud, bins = 5) +
+  scale_fill_viridis_c(option = "magma") +
+  facet_wrap(~lyr) +
+  coord_sf() +
+  labs(fill = "UD component",
+       caption = "UD component = percentage of the smallest home range containing this pixel\n
+       Utilisation distribution = probability density that an animal is found at a point\n
+       Intensity distribution = average residency time\n
+       Recursion distribution = reflecting the number of visits") +
+  theme_minimal()
+
+plot_lims <- as.data.frame(gps_df) %>%
+  summarise(x = median(X),
+            y = median(Y)) %>%
+  vect(geom = c("x", "y"), crs = SD_crs) %>%
+  buffer(5000) %>%
+  ext()
+
+zoomed_vol_ud <- decomposing_vol_ud +
+  coord_sf(xlim = plot_lims[1:2], ylim = plot_lims[3:4])
+
+## Plot ud with overlay of observed locations
+dens_plot <- decomposing_vol_ud +
+  geom_spatvector(data = gps_vect, colour = "white", alpha = 0.2)
+
+
+# Limit to 8-8 only -------------------------------------------------------
+gps_day <- gps_vect %>%
+  filter(hour(local_datetime) >= 8 &
+           hour(local_datetime) <= 20)
+
+gps_day_df <- sf::st_as_sf(gps_day) %>%
+  sf::st_coordinates()
+
+d_1 <- as.ltraj(xy = gps_day_df,
+              date = gps_day$local_datetime,
+              id = "site",
+              typeII = TRUE,
+              proj4string = CRS(SD_crs))
+summary(d_1)
+plot(d_1)
+
+d2_1 <- setNA(d_1, start_time, polling, tol = tol_s, units = "sec")
+summary(d2_1)
+
+## Set NAs based on start time for every 90 seconds
+d3_1 <- sett0(d2_1, start_time, 90, correction.xy = c("none"), tol = tol_s, units = "sec")
+summary(d3_1)
+
+## Estimate the diffusion component
+diffusion_1 <- BRB.D(d3_1, Tmax = tmax, Lmin = lmin, habitat = NULL, activity = NULL)
+diffusion_1
+
+## Estimate utilisation distribution
+ud_1 <- BRB(d3_1, D = diffusion, Tmax = tmax, Lmin = lmin, hmin = hmin, type = "UD",
+            b = FALSE, same4all = FALSE, extent = 0.1, grid = 370)
+
+summary(ud_1)
+
+## Obtain predictions from ud
+SD_dens_1 <- tibble(x = ud_1@coords[, 1],
+                    y = ud_1@coords[, 2],
+                    density = ud_1$dens)
+
+dens_vect_1 <- SD_dens_1 %>%
   vect(geom = c("x", "y"), crs = SD_crs)
 
-ggplot() +
-  geom_spatvector(data = dens_vect, aes(colour = density))
+dens_rast_1 <- terra::rasterize(dens_vect_1, r_SD, field = "density", fun = "max")
 
-dens_rast <- terra::rasterize(dens_vect, r_SD, field = "density", fun = "max")
+dens_rast_1[dens_rast_1 == 0] <- NA
 
-## Plot utilisation distribution
-vud <- getvolumeUD(ud)
-image(vud)
+## Plot ud with overlay of observed locations
+dens_plot_1 <- ggplot() +
+  geom_spatraster(data = dens_rast_1, aes(fill = max)) +
+  geom_spatvector(data = gps_day, colour = "white", alpha = 0.2) +
+  scale_fill_viridis_c(na.value = NA)
 
-## PDF for UD
-ud_vect <- as.data.frame.estUD(ud) %>%
-  vect(geom = c("x", "y"), crs = SD_crs)
+gps_vect$modelled <- terra::extract(dens_rast, gps_vect)[, 2]
 
+ggplot() + 
+  geom_histogram(data = tibble(dens = gps_vect$modelled), aes(x = dens))
