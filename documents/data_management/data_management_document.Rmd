@@ -12,6 +12,14 @@ output:
       in_header: styles.tex  
 ---  
 
+# Project data 
+
+```{r child = "project_data.rmd"}
+```
+
+# Project outcomes
+
+
 # Qualitative data  
 
 ## Participatory Rural Assessment  

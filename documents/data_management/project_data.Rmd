@@ -1,0 +1,29 @@
+
+## Anthropogenic landscape data
+
+1. Landcover/land use
+    1. Satellite (raw/previously processed)
+    2. Drone
+2. Crop stages
+    1. Satellite
+    2. Drone
+    3. Crop calendars/Qualitative data
+3. Settlement patterns
+    1. Satellite (raw/Google structures)
+    2. Drone
+    3. Transect walks
+4. Housing material and structure
+    1. Satellite
+    2. Drone
+    3. Questionnaires (Household)
+
+## Human 
+
+1. Rodent contact
+    1. Questionnaires (Household/Individual/Movement)
+    2. ProxLogs
+    3. Trapping
+2. Movement
+    1. GPS trackers
+
+## Rodent
