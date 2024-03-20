@@ -1,0 +1,20 @@
+---
+title: Household questionnaire data processing document
+author: David Simons
+date: 2024-03-20
+code-fold: true
+---
+
+# Introduction
+
+Data processing of SCAPES household questionnaires is achieved through acquiring data from the Kobotoolbox server through their API and processing through several scripts which select the relevant columns, check for missing data and rename image files. Scripts can be run individually. Alternatively this document will perform these steps sequentially which will result in updated data being sent to the project OneDrive (contact Sagan for access) where they can be used for subsequent analyses. Code chunks can be executed by pressing the green arrow in the relevant chunk or the entire document can be `knit` which will run all of the chunks.
+
+## Setup
+
+```{r setup}
+install.packages("here")
+library(here)
+
+source(here("household_questionnaire", "main", "00_libraries.R"))
+
+```

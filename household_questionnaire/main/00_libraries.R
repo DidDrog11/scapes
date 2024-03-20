@@ -16,15 +16,21 @@ pkgs <- c("cowplot",
           "janitor",
           "kableExtra",
           "knitr",
+          "progress",
           "RcppSimdJson",
           "readxl",
-          "robotoolbox",
           "terra",
           "tidyverse",
           "tidyterra",
           "viridisLite")
 
 pacman::p_load(pkgs, character.only = T)
+
+#remotes::install_gitlab("dickoa/robotoolbox", force = FALSE)
+remotes::install_version("robotoolbox", version = "1.3.2")
+library(robotoolbox)
+
+source(here("SCAPES_functions", "SCAPES_media_download.R"))
 
 project_CRS = "EPSG:4326"
 utm_nigeria_CRS = "EPSG:26332"
@@ -101,3 +107,10 @@ nigeria_states <- c("Abia", "Adamawa", "Akwa Ibom", "Anambra", "Bauchi", "Bayels
 
 Nigeria <- gadm(country = "NGA", level = 0, path = here("project_wide_data", "spatial"))
 lga <- gadm(country = "NGA", level = 2, path = here("project_wide_data", "spatial"))
+
+# create data folders
+dir.create(here("household_questionnaire", "data"))
+dir.create(here("household_questionnaire", "data", "h_data"))
+dir.create(here("household_questionnaire", "data", "i_data"))
+dir.create(here("household_questionnaire", "data", "h_data", "media"))
+dir.create(here("household_questionnaire", "data", "i_data", "media"))

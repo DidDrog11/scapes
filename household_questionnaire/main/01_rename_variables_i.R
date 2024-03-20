@@ -94,6 +94,24 @@ i_dm_hc_prep_rename <- tibble(original = names(i_dm_hc_prep),
 i_df_hc_prep <- i_dm_hc_prep %>%
   rename(!!setNames(as.character(i_dm_hc_prep_rename$original), as.character(i_dm_hc_prep_rename$new)))
 
+# Rename images -----------------------------------------------------------
+i_images <- i_df_main %>%
+  select(any_of(c("_index", "id",
+                  "rc_year_p1", "rc_year_p2", "rc_year_p3", "rc_year_p4",
+                  "consent_p1", "blood_spot"))) %>%
+  pivot_longer(cols = matches("rc|consent|blood"), values_to = "image_filename", names_to = "image_id") %>%
+  drop_na(image_filename)
+
+rename_i_images <- tibble(cur_flocation = list.files(here("household_questionnaire", "data", "i_data", "media"), full.names = TRUE),
+                          image_filename = str_split(list.files(here("household_questionnaire", "data", "i_data", "media")), "_", simplify = TRUE)[, 2]) %>%
+  full_join(i_images %>%
+              select(id, image_id, image_filename), by = "image_filename") %>%
+  mutate(new_filename = paste0(here("household_questionnaire", "data", "i_data", "media"), "/", id, "_", image_id, ".jpg")) %>%
+  select(cur_flocation, image_filename, new_filename)
+
+file.rename(rename_i_images$cur_flocation, rename_i_images$new_filename)
+
+
 # Combine df into a list --------------------------------------------------
 
 i_df <- list(individual_main = i_df_main,

@@ -218,7 +218,7 @@ knitr::include_graphics("NI_popgraph2023.jpg")
 
 ```
 
-### Geographic
+### GeographicK
 
 ```{r geo-data}
 if(!file.exists(here("project_wide_data", "spatial", "village_sampling.rds"))) {

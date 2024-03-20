@@ -17,12 +17,12 @@ h_data_files <- list.files(here("household_questionnaire", "data", "h_data"))[st
 h_dm <- read_rds(here("household_questionnaire", "data", "h_data", h_data_files[1]))
 
 h_df_main <- h_dm$main %>%
-  select(start, date, interviewer_id, `_index`, household_id, multiple_family_household, n_people, compound, n_in_other_households,
-         other_household_activities, household_ethnicity, household_religion, n_compound, n_individual_buildings, building_owned,
-         n_single_room, n_multi_room, rodent_removal_home_method, rodent_remove_use, rodent_mitigation_method, cats, cats_inside,
-         toilet, livestock, livestock_animals, meal_location, storage_cooked_containers, storage_packaged_containers, storage_seed_crop_containers_c,
-         storage_seed_crop_containers_g, food_resources, food_resources_frequency, food_sleep, food_sleep_frequency, food_day, food_day_frequency,
-         household_items, latitude, longitude, surroundings_household, surroundings_outside_other, notes)
+  select(any_of(c("start", "date", "interviewer_id", "_index", "household_id", "multiple_family_household", "n_people", "compound", "n_in_other_households",
+                  "other_household_activities", "household_ethnicity", "household_religion", "n_compound", "n_individual_buildings", "building_owned",
+                  "n_single_room", "n_multi_room", "rodent_removal_home_method", "rodent_remove_use", "rodent_mitigation_method", "cats", "cats_inside",
+                  "toilet", "livestock", "livestock_animals", "meal_location", "storage_cooked_containers", "storage_packaged_containers", "storage_seed_crop_containers_c",
+                  "storage_seed_crop_containers_g", "food_resources", "food_resources_frequency", "food_sleep", "food_sleep_frequency", "food_day", "food_day_frequency",
+                  "household_items", "latitude", "longitude", "surroundings_household", "surroundings_outside_other", "notes")))
 
 
 # Demographics of household members ---------------------------------------
@@ -129,6 +129,16 @@ h_df_images <- bind_rows(h_dm_images_outside %>%
                           mutate(image_id = paste0(image_id, "_in"),
                                  setting = "Inside"))
 
+rename_hh_images <- tibble(cur_flocation = list.files(here("household_questionnaire", "data", "h_data", "media"), full.names = TRUE),
+                           image_filename = str_split(list.files(here("household_questionnaire", "data", "h_data", "media")), "_", simplify = TRUE)[, 2]) %>%
+  full_join(h_df_images %>%
+              left_join(h_df_main %>%
+                          select(`_index`, household_id), by = "_index") %>%
+              select(household_id, image_id, image_filename), by = "image_filename") %>%
+  mutate(new_filename = paste0(here("household_questionnaire", "data", "h_data", "media"), "/", household_id, "_", image_id, ".jpg")) %>%
+  select(cur_flocation, image_filename, new_filename)
+
+file.rename(rename_hh_images$cur_flocation, rename_hh_images$new_filename)
 
 # Combine df into a list --------------------------------------------------
 
