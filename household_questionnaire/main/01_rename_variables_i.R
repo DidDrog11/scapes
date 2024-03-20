@@ -19,7 +19,7 @@ i_dm <- read_rds(here("household_questionnaire", "data", "i_data", i_data_files[
 i_df_main <- i_dm$main %>%
   select(date, interviewer_id, `_index`, household_id, participant_id, participant_id_under_12, id_confirmation, participant_id_confirm_child, id_correction, participant_id_correction_chil,
          over_18, age_individual, age_under_12, age_in_months, yob_individual, first_name, child_first_name, surname, child_surname,
-         informed_consent_adult, blood_sample_consent_adult, assent_under_18, blood_sample_assent_child, blood_spot, confirm_blood_spot,
+         informed_consent_adult, blood_sample_consent_adult, assent_under_18, blood_sample_assent_child, consent_p1, blood_spot, confirm_blood_spot,
          sex_individual, sex_under_12, ethnicity_individual, ethnicity_individual_other, religion_individual, religion_individual_other,
          education, education_other,
          community_pob, country_of_birth, state_of_birth, region_of_birth, village_of_birth, year_arrived,
@@ -102,15 +102,20 @@ i_images <- i_df_main %>%
   pivot_longer(cols = matches("rc|consent|blood"), values_to = "image_filename", names_to = "image_id") %>%
   drop_na(image_filename)
 
-rename_i_images <- tibble(cur_flocation = list.files(here("household_questionnaire", "data", "i_data", "media"), full.names = TRUE),
-                          image_filename = str_split(list.files(here("household_questionnaire", "data", "i_data", "media")), "_", simplify = TRUE)[, 2]) %>%
+media_files <- tibble(cur_flocation = list.files(here("household_questionnaire", "data", "i_data", "media"), full.names = TRUE),
+                      image_filename = str_split(list.files(here("household_questionnaire", "data", "i_data", "media")), "_", simplify = TRUE)[, 2])
+
+rename_i_images <- media_files %>%
+  filter(image_filename %in% i_images$image_filename) %>%
   full_join(i_images %>%
               select(id, image_id, image_filename), by = "image_filename") %>%
   mutate(new_filename = paste0(here("household_questionnaire", "data", "i_data", "media"), "/", id, "_", image_id, ".jpg")) %>%
   select(cur_flocation, image_filename, new_filename)
 
-file.rename(rename_i_images$cur_flocation, rename_i_images$new_filename)
+files_to_rename <- rename_i_images %>%
+  filter(!is.na(cur_flocation))
 
+if(nrow(files_to_rename) >= 1) file.rename(files_to_rename$cur_flocation, files_to_rename$new_filename)
 
 # Combine df into a list --------------------------------------------------
 

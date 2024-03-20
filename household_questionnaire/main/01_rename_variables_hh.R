@@ -129,16 +129,34 @@ h_df_images <- bind_rows(h_dm_images_outside %>%
                           mutate(image_id = paste0(image_id, "_in"),
                                  setting = "Inside"))
 
-rename_hh_images <- tibble(cur_flocation = list.files(here("household_questionnaire", "data", "h_data", "media"), full.names = TRUE),
-                           image_filename = str_split(list.files(here("household_questionnaire", "data", "h_data", "media")), "_", simplify = TRUE)[, 2]) %>%
-  full_join(h_df_images %>%
-              left_join(h_df_main %>%
-                          select(`_index`, household_id), by = "_index") %>%
-              select(household_id, image_id, image_filename), by = "image_filename") %>%
-  mutate(new_filename = paste0(here("household_questionnaire", "data", "h_data", "media"), "/", household_id, "_", image_id, ".jpg")) %>%
-  select(cur_flocation, image_filename, new_filename)
+# Rename images -----------------------------------------------------------
+# Get list of files in the media folder
+media_files <- tibble(
+  cur_flocation = list.files(here("household_questionnaire", "data", "h_data", "media"), full.names = TRUE),  # Get full file paths
+  image_filename = case_when(  # Create image filenames
+    str_detect(cur_flocation, "out|in") ~ sub(".*/", "", cur_flocation),  # If 'out' or 'in' in the path, extract filename after last '/'
+    TRUE ~ str_split(list.files(here("household_questionnaire", "data", "h_data", "media")), "_", simplify = TRUE)[, 2]  # Otherwise, split filename by '_' and extract second part
+  )
+)
 
-file.rename(rename_hh_images$cur_flocation, rename_hh_images$new_filename)
+# Join with new image names
+new_names <- h_df_images %>%
+  left_join(h_df_main %>%
+              select(`_index`, household_id), by = "_index")
+
+# Merge media files with new image names
+rename_hh_images <- media_files %>%
+  filter(image_filename %in% new_names$image_filename) %>%  # Filter for files that need renaming
+  full_join(new_names %>%
+              select(household_id, image_id, image_filename), by = "image_filename") %>%  # Join with household information and image IDs
+  mutate(new_filename = paste0(here("household_questionnaire", "data", "h_data", "media"), "/", household_id, "_", image_id, ".jpg"))  # Create new filenames
+
+# Only attempt to rename the files that need it
+files_to_rename <- rename_hh_images %>% 
+  filter(!is.na(cur_flocation))  # Filter out files with missing current filenames
+
+if(nrow(files_to_rename) >= 1) file.rename(files_to_rename$cur_flocation, files_to_rename$new_filename)  # Rename the files if there are any
+
 
 # Combine df into a list --------------------------------------------------
 
