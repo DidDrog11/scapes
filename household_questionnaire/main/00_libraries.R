@@ -16,13 +16,15 @@ pkgs <- c("cowplot",
           "janitor",
           "kableExtra",
           "knitr",
+          "Microsoft365R",
           "progress",
           "RcppSimdJson",
           "readxl",
           "terra",
           "tidyverse",
           "tidyterra",
-          "viridisLite")
+          "viridisLite",
+          "zip")
 
 pacman::p_load(pkgs, character.only = T)
 
