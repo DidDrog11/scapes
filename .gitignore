@@ -57,3 +57,6 @@ questionnaire/
 
 # Ignore additional scripts folder
 additional/
+
+# Ignore html associated folder in the household questionnaire report
+household_questionnaire/report/monitoring_files/
