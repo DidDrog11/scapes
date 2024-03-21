@@ -1,0 +1,88 @@
+This section contains the discrete planned outputs and associated questions/aims of each output.
+
+## Initial
+
+These are outputs mentioned at the Brighton 2022 meeting. **To add research questions and data needs and output lead**
+
+1.  Human Ecology and Infectious Disease - COMPLETED
+    -   Sagan Friant
+    -   Aim 1
+2.  SES application to infectious disease in human-driven landscape. System dynamics map of Lassa Fever
+    -   Aim 1
+3.  Human construction of Mastomys niche
+    -   Aim 1
+4.  Participatory mapping of human-rodent interfaces and dynamics
+    -   Aim 1
+5.  Data free rodent model
+    -   Aim 1
+6.  Value of information
+    -   Aim 1
+7.  Descriptive rodent ecology and infection across landscapes
+    -   Aim 1
+8.  Mixed-method geo-ethnography of human-rodent-environment
+    -   Aim 1
+9.  Serosurveys and seroconversion
+    -   Aim 1
+10. Epidemiological risk factors
+    -   Aim 1
+11. Reservoir and disease dynamics in West vs. East Africa
+    -   Aim 1
+12. Human movement and activity space mapping in relation to rodent abundance
+    -   Aim 1
+13. Rodent movement ecology, density and landuse
+    -   Aim 1
+14. Mini-hotspots - Spatially explicit metapopulation models - Humans, reservoir and disease dynamics
+    -   Aim 2
+15. Local/participatory scenarios and interventions
+    -   Aim 2
+16. GOATs
+    -   Aim 3
+17. Regional/National hotspots 2.0
+    -   Aim 3
+18. Human construction of Lassa niche and interventions - broad scale overview (commentary)
+19. SCAPES study protocols - In Progress
+    -   David Simons (outline produced by Dave Redding)
+
+## Additional
+
+These are potential additional outputs.
+
+1. Differences in human movement and activities by sub-groups. 
+    -   Extension of 8 and 12 above.
+    -   Do individuals in Lassa fever endemic regions have different movement patterns and space-use based on age, sex and socio-economic position?
+    -   Is between village heterogeneity greater than that of different sub-groups within a village?
+    -   What are the implications for LASV risk by age, sex and socio-economic position based on this?
+    -   Data needs: 
+        -   Human movement and space use stratified by sub-group characteristics
+        -   Land use rasters
+        -   Activity diaries
+        -   Mini-interviews
+        -   Qualitative data
+    -   Project leads: Kate Thompson with David Simons
+2. Occupation as an irrelevant risk factor for Lassa fever in endemic settings.
+    -   Interaction with 10 above.
+    -   Occupational risk factors are generally accepted for infectious disease risk, doctors ask about them, researchers publish them in table 1. However, in West Africa supplemental sources of income may convey risk that would otherwise not be recorded.
+    -   What proportion of individuals with a different occupation access farming and forested land for supplementary food or income?
+    -   How do we suggest that this should change assessment of risk of individuals?
+    -   What would the implications be for epidemiological and clinical suspicion of acute LASV infection be?
+    -   Data needs:
+        -   Human movement and space use stratified by occupation
+        -   Activity diaries
+        -   Mini-interviews
+        -   Individual questionnaires
+        -   Human serology
+        -   Case data from published sources
+    -   Project leads: David Simons
+3. Rodent activity and it's association with food insecurity.
+    -   How prevalent is food insecurity in our study region?
+    -   Is there any association between the perceived impact of rodent activity on stored food or crops in the field and food insecurity?
+    -   Is a households food insecurity associated with activity to control rodent populations?
+    -   Do more food insecure household consume more rodents?
+    -   What is the evidence and magnitude of rodent-human competition for stored food?
+    -   Data needs:
+        -   Questionnaires (measure of food insecurity, rodent presence and rodent consumption)
+        -   Rodent trapping (in both food secure and insecure households)
+    -   Project leads: David Simons
+4. Rattiness index and perceived rattiness.
+    -   The rattiness index has been developed to allow indirect estimation of rodent population density/activity in a setting
+    -   How does this match to the perception of rodent activity?

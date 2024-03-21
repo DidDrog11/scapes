@@ -1,29 +1,79 @@
+The SCAPES project requires data from multiple sources. The types of data are listed below.
 
 ## Anthropogenic landscape data
 
-1. Landcover/land use
-    1. Satellite (raw/previously processed)
-    2. Drone
-2. Crop stages
-    1. Satellite
-    2. Drone
-    3. Crop calendars/Qualitative data
-3. Settlement patterns
-    1. Satellite (raw/Google structures)
-    2. Drone
-    3. Transect walks
-4. Housing material and structure
-    1. Satellite
-    2. Drone
-    3. Questionnaires (Household)
+1.  Landcover/land use
+    1.  Satellite (raw/previously processed)
+    2.  Drone
+2.  Crop stages
+    1.  Satellite
+    2.  Drone
+    3.  Crop calendars/Qualitative data
+3.  Settlement patterns
+    1.  Satellite (raw/Google structures)
+    2.  Drone
+    3.  Transect walks
+4.  Housing material and structure
+    1.  Satellite
+    2.  Drone
+    3.  Questionnaires (Household)
 
-## Human 
+### Products
 
-1. Rodent contact
-    1. Questionnaires (Household/Individual/Movement)
-    2. ProxLogs
-    3. Trapping
-2. Movement
-    1. GPS trackers
+1.  Exposure surfaces
+
+## Human
+
+1.  Rodent contact
+    1.  Questionnaires (Household/Individual/Movement)
+    2.  ProxLogs
+    3.  Trapping
+2.  Movement
+    1.  GPS trackers
+    2.  Daily diaries
+    3.  Mini-interview
+    4.  Observation
+3.  Space use
+    1.  GPS trackers
+    2.  Daily diaries
+    3.  Mini-interview
+    4.  Observation
+4.  Livelihood
+    1.  Questionnaires (Individual)
+    2.  Qualitative
+5.  Sociodemographic
+    1.  Questionnaires (Individual)
+        1.  Age
+        2.  Sex
+        3.  Education
+6.  Food security
+    1.  Questionnaires (Household)
+    2.  Qualitative
+7.  Rodent impact on stored food
+    1.  Questionnaires (Household)
+    2.  Mini-interview
+8.  LASV serology
+    1.  Questionnaires (Individual)
+
+### Products
+
+1.  Exposure footprints
+2.  Risk factors for LASV exposure and seroconversion
+3.  Social, spatial and environmental correlates of movement pattern and risk behaviour
 
 ## Rodent
+
+1.  Rodent detections
+    1.  Species richness
+    2.  Individual abundance/density
+    3.  Occupancy
+2.  LASV serology
+3.  LASV prevalence
+4.  Rodent contact rates
+    1.  Proxloggers
+5.  Rodent movement
+
+### Products
+
+1.  Spatiotemporal host data layers. Spatially explicit predictions of rodent occupancy, density and infection by land use zone
+2.  Human-rodent overlap in space and time

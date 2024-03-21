@@ -197,7 +197,7 @@ This check assesses whether the dried blood spot (DBS) sample has been accuratel
 - `missing_dbs_id`: IDs of individuals with missing DBS IDs.
 - `missing_dbs_img`: IDs of individuals with missing DBS images.
 - `dbs_mismatch`: IDs of individuals with mismatches between DBS IDs and expected participant IDs.
-
+\footnotesize
 ```{r assess-dbs-association, tidy = TRUE, eval = FALSE}
 # Assessing missing DBS ID
 missing_dbs_id <- i_df_list$individual_main %>%
@@ -312,7 +312,8 @@ pob <- i_df_list$individual_main %>%
                                      community_pob == "no" ~ str_to_title(region_of_birth),
                                      is.na(community_pob) ~ as.character(NA)),
          state_of_birth =  case_when(community_pob == "yes" ~ clean_state_names(state),
-                                     community_pob == "no" & !is.na(state_of_birth) ~ clean_state_names(str_to_title(state_of_birth)),
+                                     community_pob == "no" & !is.na(state_of_birth) ~ 
+                                       clean_state_names(str_to_title(state_of_birth)),
                                      is.na(community_pob) ~ as.character(NA)),
          country_of_birth = case_when(community_pob == "yes" ~ "Nigeria",
                                       community_pob == "no" ~ str_to_title(country_of_birth),

@@ -1,6 +1,6 @@
 ---  
 title: "SCAPES - Data Management Plan"  
-author: "David Simons"  
+author: "SCAPES study team"  
 date: "2024-02-05"  # Replace with the current date  
 output:  
   pdf_document:  
@@ -14,11 +14,13 @@ output:
 
 # Project data 
 
-```{r child = "project_data.rmd"}
+```{r child = "project_data.Rmd"}
 ```
 
-# Project outcomes
+# Planned project outputs
 
+```{r child = "project_outputs.Rmd"}
+```
 
 # Qualitative data  
 
